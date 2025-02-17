@@ -1,0 +1,950 @@
+fileFormatVersion: 2
+guid: c364a98eb986c254eaf9decee5cb08cc
+TextureImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 0
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: HarmoniX-StickerSheet_1_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 486
+        width: 120
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5759476de1fcff241aced76908f1a313
+      internalID: 239152410
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HarmoniX-StickerSheet_1_1
+      rect:
+        serializedVersion: 2
+        x: 120
+        y: 486
+        width: 120
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 712d8e6aaa8abe447984d2e48bec43fb
+      internalID: 873645290
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HarmoniX-StickerSheet_1_2
+      rect:
+        serializedVersion: 2
+        x: 240
+        y: 486
+        width: 120
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 62126216ce5a0eb448a61d79847e0aa5
+      internalID: 50603854
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HarmoniX-StickerSheet_1_3
+      rect:
+        serializedVersion: 2
+        x: 360
+        y: 486
+        width: 120
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7d685c1d7f76e50489adb7579b4788eb
+      internalID: 1037867613
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HarmoniX-StickerSheet_1_4
+      rect:
+        serializedVersion: 2
+        x: 480
+        y: 486
+        width: 120
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0376f1e460efd8746bf49eaf3095d7f4
+      internalID: 1141356715
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HarmoniX-StickerSheet_1_5
+      rect:
+        serializedVersion: 2
+        x: 600
+        y: 486
+        width: 120
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 62e693097ae85b94cb305bf2ce6a3f7c
+      internalID: 792583833
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HarmoniX-StickerSheet_1_6
+      rect:
+        serializedVersion: 2
+        x: 720
+        y: 486
+        width: 120
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 012f76c87fd8beb4f9c42ca2650923c0
+      internalID: 2015676610
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HarmoniX-StickerSheet_1_7
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 366
+        width: 120
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f06e5fe19ab567a46881d4f9db8ecdd2
+      internalID: -1467151447
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HarmoniX-StickerSheet_1_8
+      rect:
+        serializedVersion: 2
+        x: 120
+        y: 366
+        width: 120
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8a04be798d2a21b4b8ebd20d47e9d045
+      internalID: -1955272149
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HarmoniX-StickerSheet_1_9
+      rect:
+        serializedVersion: 2
+        x: 240
+        y: 366
+        width: 120
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: aa02a1f821e326441914d407488979d5
+      internalID: -1045757207
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HarmoniX-StickerSheet_1_10
+      rect:
+        serializedVersion: 2
+        x: 360
+        y: 366
+        width: 120
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 454a6fd7e96ad644b8a308ef7652caa6
+      internalID: 1071636514
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HarmoniX-StickerSheet_1_11
+      rect:
+        serializedVersion: 2
+        x: 480
+        y: 366
+        width: 120
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 94dfa1e37f086484683575b7efe457a6
+      internalID: 569960786
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HarmoniX-StickerSheet_1_12
+      rect:
+        serializedVersion: 2
+        x: 600
+        y: 366
+        width: 120
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 155c16f412756a14390736d8d143dda9
+      internalID: -131666930
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HarmoniX-StickerSheet_1_13
+      rect:
+        serializedVersion: 2
+        x: 720
+        y: 366
+        width: 120
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9af4c4c777c90a944b09a06d9a1831aa
+      internalID: -1642573473
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HarmoniX-StickerSheet_1_14
+      rect:
+        serializedVersion: 2
+        x: 840
+        y: 366
+        width: 120
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ae09aeac989ae1e41b45a49ad459954b
+      internalID: 1160359051
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HarmoniX-StickerSheet_1_15
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 246
+        width: 120
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c67edcd2c5d2ac441ac0bfae885def1f
+      internalID: 2030373893
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HarmoniX-StickerSheet_1_16
+      rect:
+        serializedVersion: 2
+        x: 120
+        y: 246
+        width: 120
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 51da4fc906959704cb826bf952b6e4a3
+      internalID: -1493859928
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HarmoniX-StickerSheet_1_17
+      rect:
+        serializedVersion: 2
+        x: 240
+        y: 246
+        width: 120
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1181067e1ce06b243b0187886c4085a2
+      internalID: -788973419
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HarmoniX-StickerSheet_1_18
+      rect:
+        serializedVersion: 2
+        x: 360
+        y: 246
+        width: 120
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6dab7e150e521f24b844e87e5a2b82a6
+      internalID: 77990636
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HarmoniX-StickerSheet_1_19
+      rect:
+        serializedVersion: 2
+        x: 480
+        y: 246
+        width: 120
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 03d1022d5f092f042a82163c583bd154
+      internalID: 1275370114
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HarmoniX-StickerSheet_1_20
+      rect:
+        serializedVersion: 2
+        x: 600
+        y: 246
+        width: 120
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3631da52d0b4a0b4aa8d328a422968d3
+      internalID: -160342100
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HarmoniX-StickerSheet_1_21
+      rect:
+        serializedVersion: 2
+        x: 720
+        y: 246
+        width: 120
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6fed30cb5b4a93a429a2b5e48f33f635
+      internalID: -179351359
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HarmoniX-StickerSheet_1_22
+      rect:
+        serializedVersion: 2
+        x: 840
+        y: 246
+        width: 120
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6700aee2d7028f247a4af9334cacc9db
+      internalID: -1844550332
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HarmoniX-StickerSheet_1_23
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 126
+        width: 120
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d194383cfd3a9fb45abee86d250a6442
+      internalID: 650725149
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HarmoniX-StickerSheet_1_24
+      rect:
+        serializedVersion: 2
+        x: 120
+        y: 126
+        width: 120
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a202a78503655d74da96eba901f35153
+      internalID: 1863061003
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HarmoniX-StickerSheet_1_25
+      rect:
+        serializedVersion: 2
+        x: 240
+        y: 126
+        width: 120
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 650a02b7fe5c5eb439e9b4c607cfb9b6
+      internalID: -644738714
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HarmoniX-StickerSheet_1_26
+      rect:
+        serializedVersion: 2
+        x: 360
+        y: 126
+        width: 120
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3a716efeddf35fb4fab8af2aa18f5600
+      internalID: -235499709
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HarmoniX-StickerSheet_1_27
+      rect:
+        serializedVersion: 2
+        x: 480
+        y: 126
+        width: 120
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: da833069e1b254840bba4879b71ddfd1
+      internalID: -2016111004
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HarmoniX-StickerSheet_1_28
+      rect:
+        serializedVersion: 2
+        x: 600
+        y: 126
+        width: 120
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f6b610b245cf52344ba75d6206e462bb
+      internalID: -589621037
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HarmoniX-StickerSheet_1_29
+      rect:
+        serializedVersion: 2
+        x: 720
+        y: 126
+        width: 120
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b78b31591bdd229488937bab267771ac
+      internalID: 410414660
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HarmoniX-StickerSheet_1_30
+      rect:
+        serializedVersion: 2
+        x: 840
+        y: 126
+        width: 120
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7f33aa27766eca74b878e529e5af7c11
+      internalID: 1839330645
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HarmoniX-StickerSheet_1_31
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 6
+        width: 120
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ec453765d1f943a4294db6b2a9551b15
+      internalID: 427169603
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HarmoniX-StickerSheet_1_32
+      rect:
+        serializedVersion: 2
+        x: 120
+        y: 6
+        width: 120
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e83cd5ec09a609f4e811ce3e45a5f7c9
+      internalID: -1140200396
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HarmoniX-StickerSheet_1_33
+      rect:
+        serializedVersion: 2
+        x: 240
+        y: 6
+        width: 120
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 09bb9381c01bb8a43a90026068d63da1
+      internalID: -592051515
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HarmoniX-StickerSheet_1_34
+      rect:
+        serializedVersion: 2
+        x: 360
+        y: 6
+        width: 120
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 84e5fb9906ab6344bbc85158d2c5295c
+      internalID: 1111754970
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HarmoniX-StickerSheet_1_35
+      rect:
+        serializedVersion: 2
+        x: 480
+        y: 6
+        width: 120
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8bb8431a6cc5a0748a2fb0feea96d5a7
+      internalID: -12906120
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HarmoniX-StickerSheet_1_36
+      rect:
+        serializedVersion: 2
+        x: 600
+        y: 6
+        width: 120
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 39207260f44c6e24b9f5f5b26b6c5005
+      internalID: 2101879249
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HarmoniX-StickerSheet_1_37
+      rect:
+        serializedVersion: 2
+        x: 840
+        y: 6
+        width: 120
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7371ab10ab81d89458edfb6b4e531ef6
+      internalID: -423258052
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 4cc331a230e0f7e4491d4ad4bcc5811f
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    nameFileIdTable:
+      HarmoniX-StickerSheet_1_0: 239152410
+      HarmoniX-StickerSheet_1_1: 873645290
+      HarmoniX-StickerSheet_1_10: 1071636514
+      HarmoniX-StickerSheet_1_11: 569960786
+      HarmoniX-StickerSheet_1_12: -131666930
+      HarmoniX-StickerSheet_1_13: -1642573473
+      HarmoniX-StickerSheet_1_14: 1160359051
+      HarmoniX-StickerSheet_1_15: 2030373893
+      HarmoniX-StickerSheet_1_16: -1493859928
+      HarmoniX-StickerSheet_1_17: -788973419
+      HarmoniX-StickerSheet_1_18: 77990636
+      HarmoniX-StickerSheet_1_19: 1275370114
+      HarmoniX-StickerSheet_1_2: 50603854
+      HarmoniX-StickerSheet_1_20: -160342100
+      HarmoniX-StickerSheet_1_21: -179351359
+      HarmoniX-StickerSheet_1_22: -1844550332
+      HarmoniX-StickerSheet_1_23: 650725149
+      HarmoniX-StickerSheet_1_24: 1863061003
+      HarmoniX-StickerSheet_1_25: -644738714
+      HarmoniX-StickerSheet_1_26: -235499709
+      HarmoniX-StickerSheet_1_27: -2016111004
+      HarmoniX-StickerSheet_1_28: -589621037
+      HarmoniX-StickerSheet_1_29: 410414660
+      HarmoniX-StickerSheet_1_3: 1037867613
+      HarmoniX-StickerSheet_1_30: 1839330645
+      HarmoniX-StickerSheet_1_31: 427169603
+      HarmoniX-StickerSheet_1_32: -1140200396
+      HarmoniX-StickerSheet_1_33: -592051515
+      HarmoniX-StickerSheet_1_34: 1111754970
+      HarmoniX-StickerSheet_1_35: -12906120
+      HarmoniX-StickerSheet_1_36: 2101879249
+      HarmoniX-StickerSheet_1_37: -423258052
+      HarmoniX-StickerSheet_1_4: 1141356715
+      HarmoniX-StickerSheet_1_5: 792583833
+      HarmoniX-StickerSheet_1_6: 2015676610
+      HarmoniX-StickerSheet_1_7: -1467151447
+      HarmoniX-StickerSheet_1_8: -1955272149
+      HarmoniX-StickerSheet_1_9: -1045757207
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
