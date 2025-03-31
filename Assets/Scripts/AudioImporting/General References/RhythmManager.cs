@@ -128,7 +128,7 @@ public class RhythmManager : MonoBehaviour
             while (nextBeatIndex < beatMarkers.Count && currentTime >= beatMarkers[nextBeatIndex] - preBeatMargin)
             {
                 float beatTime = beatMarkers[nextBeatIndex];
-                Debug.Log($"Beat invoked at time {beatTime}");
+                //Debug.Log($"Beat invoked at time {beatTime}");
 
                 CurrentBeatIndex = nextBeatIndex;
 

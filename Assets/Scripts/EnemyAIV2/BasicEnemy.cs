@@ -9,6 +9,7 @@ using BlackboardSystem;
 //[RequireComponent(typeof(Animator))]
 public class BasicEnemy : MonoBehaviour
 {
+    /*
     [SerializeField] List<Transform> waypoints = new();
 
     UnityEngine.AI.NavMeshAgent agent;
@@ -31,4 +32,5 @@ public class BasicEnemy : MonoBehaviour
         //animations.SetSpeed(agent.velocity.magnitude);
         tree.Process();
     }
+    */
 }

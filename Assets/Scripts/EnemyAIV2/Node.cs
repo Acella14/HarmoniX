@@ -2,8 +2,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using System;
 
 //add repeat node
+
+public class Guard : Node {
+    private readonly Func<bool> condition;
+    
+    public Guard(string name, Func<bool> condition, Node child) : base(name) {
+        this.condition = condition;
+        AddChild(child);
+    }
+
+    public override Status Process() {
+        // If condition fails, immediately return Failure so the branch is skipped.
+        if (!condition())
+            return Status.Failure;
+        return children[0].Process();
+    }
+    
+    public override void Reset() {
+        base.Reset();
+    }
+}
 
 public class UntilFail : Node {
     public UntilFail(string name) : base(name) { }
@@ -72,6 +93,7 @@ public class PrioritySelector : Selector {
     }
 }
 
+
 /*
 * This is the "OR" logic. If one child succeeds, the entire selector returns success.
 */
@@ -81,6 +103,7 @@ public class Selector : Node {
     public override Status Process()
     {
         if (currentChild < children.Count) {
+            Debug.Log($"<color=cyan>[BEHAVIOR TREE] Processing: {children[currentChild].name}</color>");
             switch (children[currentChild].Process()) {
                 case Status.Running:
                     return Status.Running;
@@ -179,4 +202,5 @@ public class BehaviourTree : Node {
         return Status.Success;
     }
 }
+
 

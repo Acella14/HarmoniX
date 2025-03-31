@@ -2,8 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using static default_Models;
+using BlackboardSystem;
+using UnityServiceLocator;
 
-public class CustomCharacterController : MonoBehaviour
+public class CustomCharacterController : MonoBehaviour, IExpert
 {
     #region - Variable Declarations -
     private CharacterController characterController;
@@ -90,6 +92,11 @@ public class CustomCharacterController : MonoBehaviour
     public float minPitch = 0.2f;
     public float maxPitch = 1.4f;
 
+
+    [Header("Blackboard Interaction")]
+    private Blackboard blackboard;
+    private BlackboardKey playerLastPositionKey;
+
     #endregion
 
     #region - Awake -
@@ -136,6 +143,25 @@ public class CustomCharacterController : MonoBehaviour
 
     #endregion
 
+
+    void Start() {
+        blackboard = ServiceLocator.For(this).Get<BlackboardController>().GetBlackboard();
+        ServiceLocator.For(this).Get<BlackboardController>().RegisterExpert(this);
+        playerLastPositionKey = blackboard.GetOrRegisterKey("PlayerLastPosition");
+    }
+
+    public int GetInsistence(Blackboard blackboard) {
+        return 100; // Always update player's position
+    }
+
+    public void Execute(Blackboard blackboard) {
+        blackboard.AddAction(() => {
+            blackboard.SetValue(playerLastPositionKey, transform.position);
+        });
+    }
+
+
+
     #region - Update -
 
     private void Update()
@@ -148,6 +174,9 @@ public class CustomCharacterController : MonoBehaviour
 
         CalculateView();
         CalculateMovementAndGravity();
+        if (blackboard != null) {
+            blackboard.SetValue(playerLastPositionKey, transform.position);
+        }
         CalculateStance();
         UpdateAnimatorState();
         UpdateCameraFOV();

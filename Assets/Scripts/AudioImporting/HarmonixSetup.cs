@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -13,19 +14,27 @@ public class HarmonixSetup : MonoBehaviour
 
     [Header("Audio Clips")]
     public AudioSource audioSource;
+    public AudioSource backgroundMusic;
     public AudioClip startUpClick;
     public AudioClip startUpThump;
     public AudioClip[] clickSoundEffects;
+    public AudioClip activateSFX;
 
     [Header("Intro Fade")]
     public Volume globalVolume;
     public float vignetteLerpDuration = 4.0f;
+
+    [Header("Object Activation")]
+    public List<GameObject> objectsToActivate;
+    public float delayBetweenActivations = 0.5f;
 
     private Vignette vignette;
     private float currentLerpTime = 0;
 
     private Animator animator;
     private CanvasGroup canvasGroup;
+
+    private bool isFadingInCanvas = false;
 
     void Start()
     {
@@ -108,29 +117,49 @@ public class HarmonixSetup : MonoBehaviour
         animator.enabled = false;
         spriteRenderer.sprite = finalHarmonixSprite;
 
+        backgroundMusic.Play();
+
+        StartCoroutine(ActivateObjects());
+
         if (canvas != null)
         {
             canvas.SetActive(true);
             StartCoroutine(FadeInCanvas());
-            PlayRandomClickSound();
+            //PlayRandomClickSound();
+        }
+    }
+
+    private IEnumerator ActivateObjects()
+    {
+        foreach (GameObject obj in objectsToActivate)
+        {
+            obj.SetActive(true);
+            audioSource.PlayOneShot(activateSFX);
+
+            yield return new WaitForSecondsRealtime(delayBetweenActivations); // Forces an exact time delay
         }
     }
 
     private IEnumerator FadeInCanvas()
     {
+        if (isFadingInCanvas) yield break;
+        isFadingInCanvas = true;
+        
+        // Ensure smooth fade-in after activation
         float elapsedTime = 0f;
-
         while (elapsedTime < fadeDuration)
         {
             elapsedTime += Time.deltaTime;
             float t = elapsedTime / fadeDuration;
             t = t * t * (3f - 2f * t);
-
             canvasGroup.alpha = Mathf.Clamp01(t);
             yield return null;
         }
 
         canvasGroup.alpha = 1f;
     }
+
+
+
 
 }

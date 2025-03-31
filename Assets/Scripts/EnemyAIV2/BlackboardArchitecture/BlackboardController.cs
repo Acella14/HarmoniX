@@ -28,6 +28,10 @@ namespace BlackboardSystem
             foreach (var action in arbiter.BlackboardIteration(blackboard)) {
                 action();
             }
+
+            if (Input.GetKeyDown(KeyCode.B)) { // Press "B" to dump the blackboard state.
+                blackboard.Debug();
+            }
         }
     }
 }
