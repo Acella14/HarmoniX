@@ -49,7 +49,7 @@ public class Scout : EnemyVision, IExpert {
         // 1. CHASE SEQUENCE (Highest Priority: If player is visible, chase)
         Sequence engageBranch = new Sequence("Engage");
         engageBranch.AddChild(new Leaf("Check Visibility", new Condition(() => canSeePlayer))); 
-        engageBranch.AddChild(new Leaf("Chase Player", new ChasePlayerStrategy(this, agent, GetChaseSpeed(), blackboard)));
+        engageBranch.AddChild(new Leaf("Chase Player", new ChasePlayerStrategy(this, agent, GetChaseSpeed(), GetChaseRange(), blackboard)));
         mainSelector.AddChild(engageBranch);
 
         // 2. HUNT SEQUENCE (If chase fails, engage hunt)

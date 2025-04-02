@@ -101,15 +101,17 @@ public class ChasePlayerStrategy : IStrategy {
     private readonly MonoBehaviour enemy;
     private readonly NavMeshAgent agent;
     private readonly float chaseSpeed;
+    private readonly float chaseRange;
     private readonly Blackboard blackboard;
     private readonly BlackboardKey playerLastPositionKey;
     private Vector3 lastKnownPosition;
     private EnemyVision vision; // Reference to vision system
 
-    public ChasePlayerStrategy(MonoBehaviour enemy, NavMeshAgent agent, float chaseSpeed, Blackboard blackboard) {
+    public ChasePlayerStrategy(MonoBehaviour enemy, NavMeshAgent agent, float chaseSpeed, float chaseRange, Blackboard blackboard) {
         this.enemy = enemy;
         this.agent = agent;
         this.chaseSpeed = chaseSpeed;
+        this.chaseRange = chaseRange;
         this.blackboard = blackboard;
         this.vision = enemy.GetComponent<EnemyVision>();
         this.playerLastPositionKey = blackboard.GetOrRegisterKey("PlayerLastPosition");
@@ -130,9 +132,15 @@ public class ChasePlayerStrategy : IStrategy {
             return Node.Status.Failure;
         }
 
+        float dist = Vector3.Distance(enemy.transform.position, targetPosition);
+        if (dist > chaseRange - 2f) {
+            return Node.Status.Failure;
+        }
+
         lastKnownPosition = targetPosition;
         float distance = Vector3.Distance(enemy.transform.position, lastKnownPosition);
         float trackingRange = vision.trackingRange;
+
 
         // Enable chase mode vision
         vision.SetDetectionOverride(true);

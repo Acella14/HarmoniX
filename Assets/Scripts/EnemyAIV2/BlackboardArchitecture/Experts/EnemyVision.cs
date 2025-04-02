@@ -10,6 +10,9 @@ public abstract class EnemyVision : MonoBehaviour {
     [SerializeField] protected float chaseSpeed = 5f;
     [SerializeField] protected float detectionRadius = 10f;
     [SerializeField] public float trackingRange = 15f;
+    [SerializeField] protected float chaseRange = 50f;
+    public float GetChaseRange() => chaseRange;
+
     [SerializeField] protected float fovAngle = 90f;
     [SerializeField] protected float detectionDelay = 1f;
     [SerializeField] protected LayerMask playerLayer;

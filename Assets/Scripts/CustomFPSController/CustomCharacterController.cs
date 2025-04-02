@@ -5,7 +5,7 @@ using static default_Models;
 using BlackboardSystem;
 using UnityServiceLocator;
 
-public class CustomCharacterController : MonoBehaviour, IExpert
+public class CustomCharacterController : MonoBehaviour, IExpert, IShockwaveLaunchable
 {
     #region - Variable Declarations -
     private CharacterController characterController;
@@ -338,6 +338,59 @@ public class CustomCharacterController : MonoBehaviour, IExpert
             }
         }
     }
+
+    public void LaunchFromShockwave(Vector3 origin, float force, float radius)
+    {
+        Debug.Log("Launched player from shockwave");
+        StartCoroutine(ShakeCamera(1f, 0.8f, 1.5f));
+
+        // Direction from shockwave origin to player
+        Vector3 direction = (transform.position - origin).normalized;
+
+        // Apply mostly vertical force
+        float verticalForce = force; // Use full force upward
+        velocity.y = verticalForce;
+
+        // Apply a small horizontal push
+        float horizontalScale = 0.1f; // Only 10% of force goes into horizontal
+        Vector3 horizontalPush = new Vector3(direction.x, 0f, direction.z) * (force * horizontalScale);
+        velocity += horizontalPush;
+    }
+
+    public IEnumerator ShakeCamera(float duration, float amplitude, float frequency)
+    {
+        var virtualCam = cameraHolder.GetComponentInChildren<Cinemachine.CinemachineVirtualCamera>();
+        var noise = virtualCam.GetCinemachineComponent<Cinemachine.CinemachineBasicMultiChannelPerlin>();
+
+        float timer = 0f;
+        float halfDuration = duration * 0.5f;
+
+        // Fade in
+        while (timer < halfDuration)
+        {
+            float t = timer / halfDuration;
+            noise.m_AmplitudeGain = Mathf.Lerp(0f, amplitude, t);
+            noise.m_FrequencyGain = Mathf.Lerp(0f, frequency, t);
+            timer += Time.deltaTime;
+            yield return null;
+        }
+
+        // Fade out
+        timer = 0f;
+        while (timer < halfDuration)
+        {
+            float t = timer / halfDuration;
+            noise.m_AmplitudeGain = Mathf.Lerp(amplitude, 0f, t);
+            noise.m_FrequencyGain = Mathf.Lerp(frequency, 0f, t);
+            timer += Time.deltaTime;
+            yield return null;
+        }
+
+        // Ensure reset
+        noise.m_AmplitudeGain = 0f;
+        noise.m_FrequencyGain = 0f;
+    }
+
 
     #endregion
 
