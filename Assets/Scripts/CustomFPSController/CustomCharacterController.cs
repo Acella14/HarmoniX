@@ -4,6 +4,8 @@ using UnityEngine;
 using static default_Models;
 using BlackboardSystem;
 using UnityServiceLocator;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 public class CustomCharacterController : MonoBehaviour, IExpert, IShockwaveLaunchable
 {
@@ -32,6 +34,8 @@ public class CustomCharacterController : MonoBehaviour, IExpert, IShockwaveLaunc
     public float viewClampYMax = 80f;
     public float groundDistance = 0.4f;
     public LayerMask playerMask;
+    private PlayerHealth health;
+    private PostProcessingFeedback postFX;
 
     [Header("Gravity and Jump")]
     public float gravity = -9.81f;
@@ -145,6 +149,16 @@ public class CustomCharacterController : MonoBehaviour, IExpert, IShockwaveLaunc
 
 
     void Start() {
+        health = GetComponent<PlayerHealth>();
+        postFX = GetComponent<PostProcessingFeedback>();
+
+        if (health != null)
+        {
+            UIManager.Instance.Init(health);
+
+            health.OnDamaged += postFX.PlayDamageEffect;
+        }
+
         blackboard = ServiceLocator.For(this).Get<BlackboardController>().GetBlackboard();
         ServiceLocator.For(this).Get<BlackboardController>().RegisterExpert(this);
         playerLastPositionKey = blackboard.GetOrRegisterKey("PlayerLastPosition");
@@ -339,7 +353,7 @@ public class CustomCharacterController : MonoBehaviour, IExpert, IShockwaveLaunc
         }
     }
 
-    public void LaunchFromShockwave(Vector3 origin, float force, float radius)
+    public void LaunchFromShockwave(Vector3 origin, float force, float radius, int damage)
     {
         Debug.Log("Launched player from shockwave");
         StartCoroutine(ShakeCamera(1f, 0.8f, 1.5f));
@@ -348,13 +362,15 @@ public class CustomCharacterController : MonoBehaviour, IExpert, IShockwaveLaunc
         Vector3 direction = (transform.position - origin).normalized;
 
         // Apply mostly vertical force
-        float verticalForce = force; // Use full force upward
+        float verticalForce = force;
         velocity.y = verticalForce;
 
         // Apply a small horizontal push
         float horizontalScale = 0.1f; // Only 10% of force goes into horizontal
         Vector3 horizontalPush = new Vector3(direction.x, 0f, direction.z) * (force * horizontalScale);
         velocity += horizontalPush;
+
+        health?.TakeDamage(damage);
     }
 
     public IEnumerator ShakeCamera(float duration, float amplitude, float frequency)

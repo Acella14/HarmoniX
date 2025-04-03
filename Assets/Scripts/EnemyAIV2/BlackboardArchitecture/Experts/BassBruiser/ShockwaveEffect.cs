@@ -7,6 +7,7 @@ public class ShockwaveEffect : MonoBehaviour {
     public float explosionLifetime = 3f;
     public float radius = 5f;
     public float force = 10f;
+    public int damage = 20;
     public LayerMask playerMask;
 
     [Header("Shockwave Visual")]
@@ -17,7 +18,7 @@ public class ShockwaveEffect : MonoBehaviour {
         Collider[] hitPlayers = Physics.OverlapSphere(transform.position, radius, playerMask);
         foreach (var hit in hitPlayers) {
             if (hit.TryGetComponent<IShockwaveLaunchable>(out var launchable)) {
-                launchable.LaunchFromShockwave(transform.position, force, radius);
+                launchable.LaunchFromShockwave(transform.position, force, radius, damage);
             }
         }
     }

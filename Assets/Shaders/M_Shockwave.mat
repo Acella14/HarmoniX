@@ -62,5 +62,5 @@ Material:
     - _ShockwaveThickness: 3
     m_Colors:
     - _ShockwaveEmissionColor: {r: 0.9137255, g: 0, b: 0.45554736, a: 1}
-    - _ShockwaveOrigin: {r: 1311.5815, g: 27.217155, b: 834.55835, a: 0}
+    - _ShockwaveOrigin: {r: 1389.5713, g: 33.050484, b: 856.13336, a: 0}
   m_BuildTextureStacks: []
