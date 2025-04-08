@@ -45,6 +45,7 @@ public class CustomCharacterController : MonoBehaviour, IExpert, IShockwaveLaunc
     private Vector3 velocity;
     private bool isGrounded;
     private bool wasGrounded;
+    private int airJumpsRemaining;
 
     [Header("Stance")]
     public PlayerStance playerStance;
@@ -80,6 +81,14 @@ public class CustomCharacterController : MonoBehaviour, IExpert, IShockwaveLaunc
     public float slideCameraTilt = 10f;
     public float slideFOVAdjustAmount = 5f;
     public AudioClip slideSFX;
+
+    [Header("Ground Pound (& shockwave)")]
+    public ShockwaveEffect shockwaveEffect;
+    public ShockwaveSettings groundPoundShockwaveSettings;
+    public float groundPoundForce = 30f;
+    public float groundPoundCooldown = 1f;
+    private bool isGroundPounding = false;
+
 
     private float slideTimer;
     private bool isSliding;
@@ -118,6 +127,7 @@ public class CustomCharacterController : MonoBehaviour, IExpert, IShockwaveLaunc
         defaultInput.Character.Sprint.performed += e => ToggleSprint();
         defaultInput.Character.SprintReleased.performed += e => StopSprint();
         defaultInput.Character.Slide.performed += e => Slide();
+        defaultInput.Character.GroundPound.performed += e => TryGroundPound();
 
         defaultInput.Enable();
 
@@ -186,14 +196,25 @@ public class CustomCharacterController : MonoBehaviour, IExpert, IShockwaveLaunc
             lastMovementDirection = transform.TransformDirection(lastMovementDirection);
         }
 
+        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
+
+        if (isGrounded && !wasGrounded)
+        {
+            airJumpsRemaining = playerSettings.MaxAirJumps;
+        }
+
         CalculateView();
         CalculateMovementAndGravity();
-        if (blackboard != null) {
+        CalculateStance();
+        UpdateCameraFOV();
+        UpdateAnimatorState();
+
+        if (blackboard != null)
+        {
             blackboard.SetValue(playerLastPositionKey, transform.position);
         }
-        CalculateStance();
-        UpdateAnimatorState();
-        UpdateCameraFOV();
+
+        wasGrounded = isGrounded;
     }
 
     #endregion
@@ -324,6 +345,59 @@ public class CustomCharacterController : MonoBehaviour, IExpert, IShockwaveLaunc
 
     #endregion
 
+
+    #region - Ground Pound -
+
+    private void TryGroundPound()
+    {
+        if (characterController.isGrounded || isGroundPounding) return;
+
+        StartCoroutine(DoGroundPound());
+    }
+
+
+    private IEnumerator DoGroundPound()
+    {
+        isGroundPounding = true;
+
+        // Optional: play animation or audio
+        // currentWeaponR?.weaponAnimator.SetTrigger("GroundPoundStart");
+        // SFXSource.PlayOneShot(groundPoundStartSFX);
+
+        // Force downward velocity — accelerates fall
+        velocity.y = -Mathf.Abs(groundPoundForce);
+
+        // Wait until we hit the ground
+        while (!characterController.isGrounded)
+        {
+            yield return null;
+        }
+
+        // Trigger the shockwave effect on landing
+        if (shockwaveEffect != null && groundPoundShockwaveSettings != null)
+        {
+            shockwaveEffect.TriggerShockwave(transform.position, groundPoundShockwaveSettings);
+            shockwaveEffect.LaunchNearbyPlayers();
+        }
+
+        // Camera shake
+        StartCoroutine(ShakeCamera(0.6f, 1f, 2f));
+
+        // Optional: landing animation or SFX
+        // currentWeaponR?.weaponAnimator.SetTrigger("GroundPoundImpact");
+        // SFXSource.PlayOneShot(groundPoundLandSFX);
+
+        // Cooldown
+        yield return new WaitForSeconds(groundPoundCooldown);
+
+        isGroundPounding = false;
+    }
+
+
+
+    #endregion
+
+
     #region - Jumping -
 
     private void Jump()
@@ -332,26 +406,31 @@ public class CustomCharacterController : MonoBehaviour, IExpert, IShockwaveLaunc
         {
             if (playerStance == PlayerStance.Crouch)
             {
-                if (StanceCheck(playerStandStance.StanceCollider.height))
-                {
-                    return;
-                }
+                if (StanceCheck(playerStandStance.StanceCollider.height)) return;
 
                 playerStance = PlayerStance.Stand;
                 return;
             }
 
-            audioSource.PlayOneShot(jumpSFX, 0.2f);
-            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-            currentWeaponR?.weaponAnimator.SetTrigger("Jump");
-            currentWeaponL?.weaponAnimator.SetTrigger("Jump");
-
-            if (isSliding)
-            {
-                EndSlide();
-            }
+            PerformJump();
+        }
+        else if (airJumpsRemaining > 0)
+        {
+            airJumpsRemaining--;
+            PerformJump();
         }
     }
+
+    private void PerformJump()
+    {
+        audioSource.PlayOneShot(jumpSFX, 0.2f);
+        velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+        currentWeaponR?.weaponAnimator.SetTrigger("Jump");
+        currentWeaponL?.weaponAnimator.SetTrigger("Jump");
+
+        if (isSliding) EndSlide();
+    }
+
 
     public void LaunchFromShockwave(Vector3 origin, float force, float radius, int damage)
     {

@@ -17,6 +17,7 @@ public class JumpAndSlamStrategy : IStrategy {
 
     private bool jumpStarted = false;
     private bool slamTriggered = false;
+    private readonly ShockwaveSettings slamShockwaveSettings;
     private bool isOnCooldown = false;
     private bool windupDone = false;
     private float timer = 0f;
@@ -28,7 +29,7 @@ public class JumpAndSlamStrategy : IStrategy {
     private EnemyVision vision;
     private Transform enemyTransform;
 
-    public JumpAndSlamStrategy(MonoBehaviour enemy, Animator animator, Blackboard blackboard, AnimationCurve jumpCurve, float jumpDuration = 2f, float slamCooldown = 3f, float jumpWindupTime = 1f, float targetLockProgress = 0.95f) {
+    public JumpAndSlamStrategy(MonoBehaviour enemy, Animator animator, Blackboard blackboard, AnimationCurve jumpCurve, ShockwaveSettings slamShockwaveSettings, float jumpDuration = 2f, float slamCooldown = 3f, float jumpWindupTime = 1f, float targetLockProgress = 0.95f) {
         this.enemy = enemy;
         this.animator = animator;
         this.blackboard = blackboard;
@@ -37,6 +38,8 @@ public class JumpAndSlamStrategy : IStrategy {
         this.slamCooldown = slamCooldown;
         this.jumpWindupTime = jumpWindupTime;
         this.targetLockProgress = Mathf.Clamp01(targetLockProgress);
+        this.slamShockwaveSettings = slamShockwaveSettings;
+        
         this.playerLastPositionKey = blackboard.GetOrRegisterKey("PlayerLastPosition");
         this.agent = enemy.GetComponent<NavMeshAgent>();
         this.vision = enemy.GetComponent<EnemyVision>();
@@ -116,8 +119,8 @@ public class JumpAndSlamStrategy : IStrategy {
 
         // PHYSICS: Launch player if in range BEFORE visual effect
         if (enemy.TryGetComponent<ShockwaveEffect>(out var shockwave)) {
-            shockwave.LaunchNearbyPlayers(); // new method
-            shockwave.TriggerVisualShockwave(enemyTransform.position); // rename this
+            shockwave.LaunchNearbyPlayers();
+            shockwave.TriggerShockwave(enemyTransform.position, slamShockwaveSettings);
         }
 
         // Maintain tracking after slam

@@ -30,6 +30,7 @@ public static class default_Models {
         public float RunningStrafeSpeed;
 
         [Header("Jumping")]
+        public int MaxAirJumps = 0;
         public float FallingSmoothing;
 
         [Header("Speed Effectors")]

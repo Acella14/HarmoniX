@@ -249347,11 +249347,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shockwaveMaterial: {fileID: 2100000, guid: 1014fcf1e8bfc624183ede7c6614496f, type: 2}
-  maxRadius: 12
-  duration: 2
-  strength: 1.2
-  thickness: 3
-  emissionColor: {r: 0.9137255, g: 0, b: 0.45554736, a: 1}
   audioSource: {fileID: 425788886}
   shockwaveSFX: {fileID: 8300000, guid: 6fd171507ee274c4ea50caeb38bb37b8, type: 3}
 --- !u!65 &425788885
@@ -252426,6 +252421,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 759299196}
+  - component: {fileID: 759299204}
   - component: {fileID: 759299202}
   - component: {fileID: 759299193}
   - component: {fileID: 759299200}
@@ -252434,8 +252430,8 @@ GameObject:
   - component: {fileID: 759299205}
   - component: {fileID: 759299201}
   - component: {fileID: 759299203}
-  - component: {fileID: 759299204}
   - component: {fileID: 759299206}
+  - component: {fileID: 759299207}
   m_Layer: 9
   m_Name: Player
   m_TagString: Untagged
@@ -252516,6 +252512,7 @@ MonoBehaviour:
     WalkingStrafeSpeed: 28
     RunningForwardSpeed: 28
     RunningStrafeSpeed: 28
+    MaxAirJumps: 1
     FallingSmoothing: 0.16
     SpeedEffector: 1
     CrouchSpeedEffector: 0.4
@@ -252572,6 +252569,16 @@ MonoBehaviour:
   slideCameraTilt: 8
   slideFOVAdjustAmount: 5
   slideSFX: {fileID: 8300000, guid: 40a346d85001e1f498f408187fe7b941, type: 3}
+  shockwaveEffect: {fileID: 759299207}
+  groundPoundShockwaveSettings:
+    maxRadius: 10
+    duration: 1
+    strength: 0.5
+    thickness: 3
+    emissionColor: {r: 0, g: 0.9905014, b: 1, a: 1}
+    particleScale: 3
+  groundPoundForce: 30
+  groundPoundCooldown: 5
   minPitch: 0.8
   maxPitch: 1.1
 --- !u!143 &759299198
@@ -252746,6 +252753,10 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 464a65bf-4040-4a7b-9aa7-e458385537d5
     m_ActionName: Character/Ability1[/Keyboard/f]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: f8a750c2-e5ce-4b66-be40-ed558b3bde95
+    m_ActionName: Character/GroundPound[/Keyboard/c]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Character
@@ -252824,6 +252835,29 @@ MonoBehaviour:
   vignetteIntensityBoost: 0.4
   chromaticBoost: 1
   duration: 0.8
+--- !u!114 &759299207
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 759299192}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474cb9805c156774bb2c95169fea8b79, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shockwaveExplosionPrefab: {fileID: 2708598583397607911, guid: 6398d43fe79ea0140913dc5530c646af,
+    type: 3}
+  explosionLifetime: 3
+  radius: 5
+  force: 10
+  damage: 0
+  playerMask:
+    serializedVersion: 2
+    m_Bits: 512
+  explosionOffset: {x: 0, y: 0, z: 0}
+  shockwaveController: {fileID: 425788882}
 --- !u!1 &771036033
 GameObject:
   m_ObjectHideFlags: 0
@@ -260896,7 +260930,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   shockwaveExplosionPrefab: {fileID: 4593184484909914552, guid: 2e1e9506f5904a64b81744324fb7cd50,
     type: 3}
-  explosionScale: 6
   explosionLifetime: 3
   radius: 50
   force: 35
@@ -260904,8 +260937,8 @@ MonoBehaviour:
   playerMask:
     serializedVersion: 2
     m_Bits: 512
-  shockwaveController: {fileID: 425788882}
   explosionOffset: {x: 0, y: -6, z: 0}
+  shockwaveController: {fileID: 425788882}
 --- !u!114 &1950162671
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -260986,6 +261019,13 @@ MonoBehaviour:
   audioSource: {fileID: 1950162675}
   chargeClip: {fileID: 0}
   jumpLaunchClip: {fileID: 8300000, guid: c652c65f1447db745919543210977e85, type: 3}
+  slamShockwaveSettings:
+    maxRadius: 12
+    duration: 2
+    strength: 1.2
+    thickness: 3
+    emissionColor: {r: 1, g: 0, b: 0.61995935, a: 1}
+    particleScale: 8
   shockwave: {fileID: 1950162670}
 --- !u!95 &1950162672
 Animator:

@@ -107,6 +107,15 @@ public partial class @DefaultInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""GroundPound"",
+                    ""type"": ""Button"",
+                    ""id"": ""f8a750c2-e5ce-4b66-be40-ed558b3bde95"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -263,6 +272,17 @@ public partial class @DefaultInput: IInputActionCollection2, IDisposable
                     ""action"": ""Ability1"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ad96dcdf-46ef-452a-a87b-0eeef67acc68"",
+                    ""path"": ""<Keyboard>/c"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""GroundPound"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -328,6 +348,7 @@ public partial class @DefaultInput: IInputActionCollection2, IDisposable
         m_Character_Shoot = m_Character.FindAction("Shoot", throwIfNotFound: true);
         m_Character_Slide = m_Character.FindAction("Slide", throwIfNotFound: true);
         m_Character_Ability1 = m_Character.FindAction("Ability1", throwIfNotFound: true);
+        m_Character_GroundPound = m_Character.FindAction("GroundPound", throwIfNotFound: true);
         // CD Control
         m_CDControl = asset.FindActionMap("CD Control", throwIfNotFound: true);
         m_CDControl_Drag = m_CDControl.FindAction("Drag", throwIfNotFound: true);
@@ -402,6 +423,7 @@ public partial class @DefaultInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_Character_Shoot;
     private readonly InputAction m_Character_Slide;
     private readonly InputAction m_Character_Ability1;
+    private readonly InputAction m_Character_GroundPound;
     public struct CharacterActions
     {
         private @DefaultInput m_Wrapper;
@@ -415,6 +437,7 @@ public partial class @DefaultInput: IInputActionCollection2, IDisposable
         public InputAction @Shoot => m_Wrapper.m_Character_Shoot;
         public InputAction @Slide => m_Wrapper.m_Character_Slide;
         public InputAction @Ability1 => m_Wrapper.m_Character_Ability1;
+        public InputAction @GroundPound => m_Wrapper.m_Character_GroundPound;
         public InputActionMap Get() { return m_Wrapper.m_Character; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -451,6 +474,9 @@ public partial class @DefaultInput: IInputActionCollection2, IDisposable
             @Ability1.started += instance.OnAbility1;
             @Ability1.performed += instance.OnAbility1;
             @Ability1.canceled += instance.OnAbility1;
+            @GroundPound.started += instance.OnGroundPound;
+            @GroundPound.performed += instance.OnGroundPound;
+            @GroundPound.canceled += instance.OnGroundPound;
         }
 
         private void UnregisterCallbacks(ICharacterActions instance)
@@ -482,6 +508,9 @@ public partial class @DefaultInput: IInputActionCollection2, IDisposable
             @Ability1.started -= instance.OnAbility1;
             @Ability1.performed -= instance.OnAbility1;
             @Ability1.canceled -= instance.OnAbility1;
+            @GroundPound.started -= instance.OnGroundPound;
+            @GroundPound.performed -= instance.OnGroundPound;
+            @GroundPound.canceled -= instance.OnGroundPound;
         }
 
         public void RemoveCallbacks(ICharacterActions instance)
@@ -564,6 +593,7 @@ public partial class @DefaultInput: IInputActionCollection2, IDisposable
         void OnShoot(InputAction.CallbackContext context);
         void OnSlide(InputAction.CallbackContext context);
         void OnAbility1(InputAction.CallbackContext context);
+        void OnGroundPound(InputAction.CallbackContext context);
     }
     public interface ICDControlActions
     {
