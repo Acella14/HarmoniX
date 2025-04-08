@@ -17,7 +17,7 @@ public class JumpAndSlamStrategy : IStrategy {
 
     private bool jumpStarted = false;
     private bool slamTriggered = false;
-    private readonly ShockwaveSettings slamShockwaveSettings;
+    private readonly ShockwaveEffect shockwave;
     private bool isOnCooldown = false;
     private bool windupDone = false;
     private float timer = 0f;
@@ -29,7 +29,7 @@ public class JumpAndSlamStrategy : IStrategy {
     private EnemyVision vision;
     private Transform enemyTransform;
 
-    public JumpAndSlamStrategy(MonoBehaviour enemy, Animator animator, Blackboard blackboard, AnimationCurve jumpCurve, ShockwaveSettings slamShockwaveSettings, float jumpDuration = 2f, float slamCooldown = 3f, float jumpWindupTime = 1f, float targetLockProgress = 0.95f) {
+    public JumpAndSlamStrategy(MonoBehaviour enemy, Animator animator, Blackboard blackboard, AnimationCurve jumpCurve, float jumpDuration = 2f, float slamCooldown = 3f, float jumpWindupTime = 1f, float targetLockProgress = 0.95f) {
         this.enemy = enemy;
         this.animator = animator;
         this.blackboard = blackboard;
@@ -38,12 +38,13 @@ public class JumpAndSlamStrategy : IStrategy {
         this.slamCooldown = slamCooldown;
         this.jumpWindupTime = jumpWindupTime;
         this.targetLockProgress = Mathf.Clamp01(targetLockProgress);
-        this.slamShockwaveSettings = slamShockwaveSettings;
-        
+
         this.playerLastPositionKey = blackboard.GetOrRegisterKey("PlayerLastPosition");
         this.agent = enemy.GetComponent<NavMeshAgent>();
         this.vision = enemy.GetComponent<EnemyVision>();
         this.enemyTransform = enemy.transform;
+
+        this.shockwave = enemy.GetComponent<ShockwaveEffect>();
     }
 
     public Node.Status Process() {
@@ -118,9 +119,9 @@ public class JumpAndSlamStrategy : IStrategy {
         agent.Warp(enemyTransform.position);
 
         // PHYSICS: Launch player if in range BEFORE visual effect
-        if (enemy.TryGetComponent<ShockwaveEffect>(out var shockwave)) {
+        if (shockwave != null) {
             shockwave.LaunchNearbyPlayers();
-            shockwave.TriggerShockwave(enemyTransform.position, slamShockwaveSettings);
+            shockwave.TriggerShockwave(enemyTransform.position, shockwave.shockwaveSettings);
         }
 
         // Maintain tracking after slam

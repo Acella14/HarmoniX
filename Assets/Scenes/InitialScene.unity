@@ -249259,9 +249259,9 @@ GameObject:
   - component: {fileID: 425788881}
   - component: {fileID: 425788880}
   - component: {fileID: 425788879}
-  - component: {fileID: 425788882}
   - component: {fileID: 425788885}
   - component: {fileID: 425788886}
+  - component: {fileID: 425788887}
   m_Layer: 8
   m_Name: Cube
   m_TagString: Untagged
@@ -249329,26 +249329,11 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 1441.4647, y: 25.7, z: 896}
-  m_LocalScale: {x: 20, y: 20, z: 20}
+  m_LocalScale: {x: 10, y: 10, z: 10}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
---- !u!114 &425788882
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 425788877}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f30cfd7c745fff142b1cc8d97151adee, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  shockwaveMaterial: {fileID: 2100000, guid: 1014fcf1e8bfc624183ede7c6614496f, type: 2}
-  audioSource: {fileID: 425788886}
-  shockwaveSFX: {fileID: 8300000, guid: 6fd171507ee274c4ea50caeb38bb37b8, type: 3}
 --- !u!65 &425788885
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -249466,6 +249451,21 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &425788887
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 425788877}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 941d42e2b3df3d14e8d1e46b32647e63, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shockwaveMaterial: {fileID: 2100000, guid: 1014fcf1e8bfc624183ede7c6614496f, type: 2}
+  maxEffects: 16
+  sfxSource: {fileID: 425788886}
 --- !u!1 &435127624
 GameObject:
   m_ObjectHideFlags: 0
@@ -252570,13 +252570,6 @@ MonoBehaviour:
   slideFOVAdjustAmount: 5
   slideSFX: {fileID: 8300000, guid: 40a346d85001e1f498f408187fe7b941, type: 3}
   shockwaveEffect: {fileID: 759299207}
-  groundPoundShockwaveSettings:
-    maxRadius: 10
-    duration: 1
-    strength: 0.5
-    thickness: 3
-    emissionColor: {r: 0, g: 0.9905014, b: 1, a: 1}
-    particleScale: 3
   groundPoundForce: 30
   groundPoundCooldown: 5
   minPitch: 0.8
@@ -252847,6 +252840,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 474cb9805c156774bb2c95169fea8b79, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  shockwaveGPUController: {fileID: 425788887}
+  shockwaveSettings:
+    rid: 2458825945257607169
   shockwaveExplosionPrefab: {fileID: 2708598583397607911, guid: 6398d43fe79ea0140913dc5530c646af,
     type: 3}
   explosionLifetime: 3
@@ -252857,7 +252853,19 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 512
   explosionOffset: {x: 0, y: 0, z: 0}
-  shockwaveController: {fileID: 425788882}
+  shockwaveSFX: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 2458825945257607169
+      type: {class: RadialShockwaveSettings, ns: , asm: Assembly-CSharp}
+      data:
+        maxRadius: 8
+        duration: 1
+        strength: 1
+        thickness: 0.75
+        emissionColor: {r: 1, g: 1, b: 1, a: 1}
+        particleScale: 1.1
 --- !u!1 &771036033
 GameObject:
   m_ObjectHideFlags: 0
@@ -260928,6 +260936,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 474cb9805c156774bb2c95169fea8b79, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  shockwaveGPUController: {fileID: 425788887}
+  shockwaveSettings:
+    rid: 2458825945257607172
   shockwaveExplosionPrefab: {fileID: 4593184484909914552, guid: 2e1e9506f5904a64b81744324fb7cd50,
     type: 3}
   explosionLifetime: 3
@@ -260938,7 +260949,19 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 512
   explosionOffset: {x: 0, y: -6, z: 0}
-  shockwaveController: {fileID: 425788882}
+  shockwaveSFX: {fileID: 8300000, guid: 6fd171507ee274c4ea50caeb38bb37b8, type: 3}
+  references:
+    version: 2
+    RefIds:
+    - rid: 2458825945257607172
+      type: {class: RadialShockwaveSettings, ns: , asm: Assembly-CSharp}
+      data:
+        maxRadius: 12
+        duration: 1.5
+        strength: 1
+        thickness: 3
+        emissionColor: {r: 1, g: 0, b: 0.4987526, a: 1}
+        particleScale: 6
 --- !u!114 &1950162671
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -260955,7 +260978,7 @@ MonoBehaviour:
   chaseSpeed: 20
   detectionRadius: 100
   trackingRange: 300
-  chaseRange: 70
+  chaseRange: 50
   fovAngle: 90
   detectionDelay: 0.1
   playerLayer:
@@ -261019,14 +261042,6 @@ MonoBehaviour:
   audioSource: {fileID: 1950162675}
   chargeClip: {fileID: 0}
   jumpLaunchClip: {fileID: 8300000, guid: c652c65f1447db745919543210977e85, type: 3}
-  slamShockwaveSettings:
-    maxRadius: 12
-    duration: 2
-    strength: 1.2
-    thickness: 3
-    emissionColor: {r: 1, g: 0, b: 0.61995935, a: 1}
-    particleScale: 8
-  shockwave: {fileID: 1950162670}
 --- !u!95 &1950162672
 Animator:
   serializedVersion: 5

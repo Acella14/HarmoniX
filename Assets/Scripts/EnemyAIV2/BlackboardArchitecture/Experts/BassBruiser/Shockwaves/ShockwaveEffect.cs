@@ -1,6 +1,17 @@
 using UnityEngine;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 public class ShockwaveEffect : MonoBehaviour {
+    [Header("Shockwave Controller")]
+    public ShockwaveGPUController shockwaveGPUController;
+
+    [Header("Shockwave Settings")]
+    [SerializeReference]
+    public ShockwaveSettings shockwaveSettings;
+
     [Header("Physics Settings")]
     public GameObject shockwaveExplosionPrefab;
     public float explosionLifetime = 3f;
@@ -10,8 +21,9 @@ public class ShockwaveEffect : MonoBehaviour {
     public LayerMask playerMask;
     public Vector3 explosionOffset = Vector3.zero;
 
-    [Header("Shockwave Controller")]
-    public ShockwaveController shockwaveController;
+    [Header("Audio")]
+    public AudioClip shockwaveSFX;
+
 
     public void LaunchNearbyPlayers() {
         Collider[] hitPlayers = Physics.OverlapSphere(transform.position, radius, playerMask);
@@ -30,8 +42,41 @@ public class ShockwaveEffect : MonoBehaviour {
             Destroy(instance, explosionLifetime);
         }
 
-        if (shockwaveController != null) {
-            shockwaveController.TriggerShockwave(center, settings);
+        if (shockwaveGPUController != null) {
+            shockwaveGPUController.AddShockwave(center, settings);
         }
+
+        shockwaveGPUController.sfxSource.PlayOneShot(shockwaveSFX);
     }
+
+
+    #if UNITY_EDITOR
+    [ContextMenu("Set Line Shockwave Settings")]
+    private void SetLineShockwaveSettings() {
+        shockwaveSettings = new LineShockwaveSettings {
+            maxRadius = 10f,
+            duration = 1.5f,
+            strength = 0.8f,
+            thickness = 1.2f,
+            emissionColor = Color.blue,
+            particleScale = 1f,
+            target = transform.position + transform.forward * 5f,
+            width = 0.3f
+        };
+    }
+
+    [ContextMenu("Set Radial Shockwave Settings")]
+    private void SetRadialShockwaveSettings() {
+        shockwaveSettings = new RadialShockwaveSettings {
+            maxRadius = 8f,
+            duration = 1f,
+            strength = 1f,
+            thickness = 0.75f,
+            emissionColor = Color.white,
+            particleScale = 1f
+        };
+    }
+    #endif
+
+
 }
