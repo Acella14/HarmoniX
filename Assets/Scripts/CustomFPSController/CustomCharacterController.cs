@@ -7,7 +7,7 @@ using UnityServiceLocator;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-public class CustomCharacterController : MonoBehaviour, IExpert, IShockwaveLaunchable
+public class CustomCharacterController : MonoBehaviour, IExpert, IShockwaveLaunchable, IKnockbackReceiver
 {
     #region - Variable Declarations -
     private CharacterController characterController;
@@ -109,6 +109,7 @@ public class CustomCharacterController : MonoBehaviour, IExpert, IShockwaveLaunc
     [Header("Blackboard Interaction")]
     private Blackboard blackboard;
     private BlackboardKey playerLastPositionKey;
+    private BlackboardKey playerGroundPointKey;
 
     #endregion
 
@@ -172,6 +173,7 @@ public class CustomCharacterController : MonoBehaviour, IExpert, IShockwaveLaunc
         blackboard = ServiceLocator.For(this).Get<BlackboardController>().GetBlackboard();
         ServiceLocator.For(this).Get<BlackboardController>().RegisterExpert(this);
         playerLastPositionKey = blackboard.GetOrRegisterKey("PlayerLastPosition");
+        playerGroundPointKey = blackboard.GetOrRegisterKey("PlayerGroundPoint");
     }
 
     public int GetInsistence(Blackboard blackboard) {
@@ -212,6 +214,14 @@ public class CustomCharacterController : MonoBehaviour, IExpert, IShockwaveLaunc
         if (blackboard != null)
         {
             blackboard.SetValue(playerLastPositionKey, transform.position);
+
+            // Raycast from player down to find ground
+            Ray ray = new Ray(transform.position, Vector3.down);
+            if (Physics.Raycast(ray, out RaycastHit hit, 100f, groundMask)) {
+                blackboard.SetValue(playerGroundPointKey, hit.point);
+            } else {
+                blackboard.SetValue(playerGroundPointKey, transform.position);
+            }
         }
 
         wasGrounded = isGrounded;
@@ -451,6 +461,14 @@ public class CustomCharacterController : MonoBehaviour, IExpert, IShockwaveLaunc
 
         health?.TakeDamage(damage);
     }
+
+    public void ApplyKnockback(Vector3 force) {
+        velocity += force;
+        
+        StartCoroutine(ShakeCamera(0.3f, 0.5f, 1f));
+        Debug.Log("Knockback applied to player: " + force);
+    }
+
 
     public IEnumerator ShakeCamera(float duration, float amplitude, float frequency)
     {

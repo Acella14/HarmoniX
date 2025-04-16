@@ -15,7 +15,7 @@ public abstract class EnemyVision : MonoBehaviour {
 
     [SerializeField] protected float fovAngle = 90f;
     [SerializeField] protected float detectionDelay = 1f;
-    [SerializeField] protected LayerMask playerLayer;
+    [SerializeField] public LayerMask playerLayer;
     [SerializeField] public LayerMask obstacleLayer;
 
     public bool canSeePlayer = false;  // Controlled by detection & chase logic
@@ -52,33 +52,40 @@ public abstract class EnemyVision : MonoBehaviour {
     protected virtual void DetectPlayer() {
         canSeePlayer = false; // Reset unless detection occurs
 
+        if (overrideDetection) {
+            // Use last known player position from blackboard
+            if (blackboard.TryGetValue(playerLastPositionKey, out Vector3 playerPos)) {
+                float distanceToTarget = Vector3.Distance(transform.position, playerPos);
+                Vector3 directionToTarget = (playerPos - transform.position).normalized;
+
+                if (distanceToTarget > trackingRange) {
+                    Debug.Log($"<color=black>[LOST: Tracking Range Exceeded]</color> {gameObject.name} cannot track player anymore.");
+                    overrideDetection = false;
+                    OnPlayerLost();
+                    return;
+                }
+
+                if (!Physics.Raycast(transform.position, directionToTarget, distanceToTarget, obstacleLayer)) {
+                    canSeePlayer = true;
+                    Debug.Log($"<color=green>[CHASE MODE: Can See Player]</color> {gameObject.name} still sees the player.");
+                    return;
+                }
+            }
+        }
+
+        // Perform normal FOV + Line of Sight detection
         Collider[] colliders = Physics.OverlapSphere(transform.position, detectionRadius, playerLayer);
         foreach (Collider col in colliders) {
             Vector3 directionToTarget = (col.transform.position - transform.position).normalized;
             float distanceToTarget = Vector3.Distance(transform.position, col.transform.position);
             float angle = Vector3.Angle(transform.forward, directionToTarget);
 
-            if (overrideDetection) {
-                // Allow continued tracking even if vision cone is temporarily broken
-                if (distanceToTarget > trackingRange) {
-                    Debug.Log($"<color=black>[LOST: Tracking Range Exceeded]</color> {gameObject.name} cannot track player anymore.");
-                    overrideDetection = false; 
-                    OnPlayerLost();
-                    return;
-                }
-                if (!Physics.Raycast(transform.position, directionToTarget, distanceToTarget, obstacleLayer)) {
-                    canSeePlayer = true;
-                    Debug.Log($"<color=green>[CHASE MODE: Can See Player]</color> {gameObject.name} still sees the player.");
-                    return;
-                }
-            } else {
-                // Normal Vision Check
-                if (angle < fovAngle * 0.5f && !Physics.Raycast(transform.position, directionToTarget, distanceToTarget, obstacleLayer)) {
-                    Debug.Log($"<color=blue>[PLAYER DETECTED]</color> {gameObject.name} spotted the player!");
-                    canSeePlayer = true;
-                    OnPlayerDetected(col.transform.position);
-                    return;
-                }
+            if (angle < fovAngle * 0.5f && !Physics.Raycast(transform.position, directionToTarget, distanceToTarget, obstacleLayer)) {
+                Debug.Log($"<color=blue>[PLAYER DETECTED]</color> {gameObject.name} spotted the player!");
+                canSeePlayer = true;
+                OnPlayerDetected(col.transform.position);
+                overrideDetection = true;
+                return;
             }
         }
 
@@ -88,6 +95,7 @@ public abstract class EnemyVision : MonoBehaviour {
             OnPlayerLost();
         }
     }
+
 
 
 

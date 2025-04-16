@@ -238,6 +238,9 @@ public class Shooter : MonoBehaviour
     {
         foreach (var audioSource in audioSources)
         {
+            if (audioSource == null)
+                continue;
+
             float adjustedPitch = Mathf.Lerp(1f, timeScale, critPitchAdjustmentFactor);
             audioSource.pitch = adjustedPitch;
         }

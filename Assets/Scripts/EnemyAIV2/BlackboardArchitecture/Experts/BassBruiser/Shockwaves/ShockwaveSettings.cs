@@ -2,11 +2,10 @@ using UnityEngine;
 
 [System.Serializable]
 public abstract class ShockwaveSettings {
-    public float maxRadius = 10f;
     public float duration = 1.5f;
     public float strength = 0.5f;
-    public float thickness = 1.0f;
-    public Color emissionColor = Color.cyan;
+    public Color emissionColorStart;
+    public Color emissionColorEnd;
     public float particleScale = 1.0f;
 
     public abstract int GetTypeId();
@@ -15,6 +14,10 @@ public abstract class ShockwaveSettings {
 // === TYPE 0: Radial ===
 [System.Serializable]
 public class RadialShockwaveSettings : ShockwaveSettings {
+    public float maxRadius = 10f;
+    public float thickness = 1.0f;
+    public float clearRadius = 0f;
+
     public override int GetTypeId() => 0;
 }
 

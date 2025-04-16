@@ -16,8 +16,8 @@ public class BassBruiser : EnemyVision, IExpert {
     [SerializeField] private float turningSpeed = 180f;
     [SerializeField] private AnimationCurve jumpArcCurve;
     [SerializeField] private float backhandRange = 3f;
-    [SerializeField] private float backhandDamage = 10f;
-    [SerializeField] private LayerMask playerMask;
+    [SerializeField] private int backhandDamage = 10;
+    [SerializeField] private float knockbackForce = 20f;
 
     [Header("Audio")]
     [SerializeField] public AudioSource audioSource;
@@ -51,19 +51,39 @@ public class BassBruiser : EnemyVision, IExpert {
         jumpBranch.AddChild(new Leaf("JumpToPlayer", new JumpAndSlamStrategy(this, animator, blackboard, jumpArcCurve, 3.0f, 5.0f, 0.95f)));
         rootSelector.AddChild(jumpBranch);
 
+        
         // 2. Backhand comes BEFORE chase
         Sequence backhandBranch = new Sequence("BackhandAttack");
-        backhandBranch.AddChild(new Leaf("IsTracking", new Condition(() => overrideDetection)));
-        backhandBranch.AddChild(new Leaf("CloseEnoughForBackhand", new Condition(() => IsWithinBackhandBufferRange())));
-        backhandBranch.AddChild(new Leaf("Backhand", new ApproachAndBackhandStrategy(this, agent, backhandRange, backhandDamage, playerMask)));
+        backhandBranch.AddChild(new Leaf("IsTracking", new Condition(() => {
+            bool val = overrideDetection;
+            Debug.Log($"[BT] IsTracking: {val}");
+            return val;
+        })));
+
+        backhandBranch.AddChild(new Leaf("CloseEnoughForBackhand", new Condition(() => {
+            bool closeEnough = IsPlayerWithinRange(backhandRange);
+            Debug.Log($"[BT] CloseEnoughForBackhand: {closeEnough}");
+            return closeEnough;
+        })));
+
+        backhandBranch.AddChild(new Leaf("KnockbackStrike",
+            new KnockbackStrikeStrategy(
+                this,
+                backhandRange,
+                backhandDamage,
+                knockbackForce
+            )
+        ));
         rootSelector.AddChild(backhandBranch);
 
         // 3. Chase
-        Sequence chaseBranch = new Sequence("ChasePlayer");
-        chaseBranch.AddChild(new Leaf("IsTracking", new Condition(() => overrideDetection)));
-        chaseBranch.AddChild(new Leaf("WithinChaseRange", new Condition(() => IsPlayerWithinRange(GetChaseRange() - 2f))));
-        chaseBranch.AddChild(new Leaf("Chase", new ChasePlayerStrategy(this, agent, GetChaseSpeed(), GetChaseRange(), blackboard)));
-        rootSelector.AddChild(chaseBranch);
+        Sequence chaseWithInterrupt = new Sequence("ChasePlayer");
+        chaseWithInterrupt.AddChild(new Leaf("IsTracking", new Condition(() => overrideDetection)));
+        chaseWithInterrupt.AddChild(new Leaf("BackhandInRange", new Condition(() => !IsPlayerWithinRange(backhandRange))));
+        chaseWithInterrupt.AddChild(new Leaf("WithinChaseRange", new Condition(() => IsPlayerWithinRange(GetChaseRange() - 2f))));
+        chaseWithInterrupt.AddChild(new Leaf("Chase", new ChasePlayerStrategy(this, agent, GetChaseSpeed(), GetChaseRange(), blackboard)));
+        rootSelector.AddChild(chaseWithInterrupt);
+        
 
         // 4. Patrol
         Sequence patrolBranch = new Sequence("Patrol");
@@ -74,13 +94,6 @@ public class BassBruiser : EnemyVision, IExpert {
         tree.AddChild(rootSelector);
         return tree;
     }
-
-
-
-    private bool IsWithinBackhandBufferRange() {
-        return IsPlayerWithinRange(backhandRange + 1.5f); // Add buffer for early grab
-    }
-
 
     private void Update() {
         if (!lastCanSeePlayer && canSeePlayer) {
@@ -105,7 +118,19 @@ public class BassBruiser : EnemyVision, IExpert {
 
 
     protected override void DetectPlayer() {
-        canSeePlayer = false;
+        if (overrideDetection) {
+            if (blackboard.TryGetValue(playerLastPositionKey, out Vector3 playerPos)) {
+                float dist = Vector3.Distance(transform.position, playerPos);
+                if (dist > trackingRange) {
+                    overrideDetection = false;
+                    canSeePlayer = false;
+                    OnPlayerLost();
+                } else {
+                    canSeePlayer = true; // Even if occluded
+                }
+            }
+            return;
+        }
 
         Collider[] colliders = Physics.OverlapSphere(transform.position, detectionRadius, playerLayer);
         foreach (Collider col in colliders) {
@@ -122,36 +147,36 @@ public class BassBruiser : EnemyVision, IExpert {
             }
         }
 
-        // Already detected — continue tracking in 360° mode
-        if (overrideDetection) {
-            if (blackboard.TryGetValue(playerLastPositionKey, out Vector3 playerPos)) {
-                float dist = Vector3.Distance(transform.position, playerPos);
-                if (dist > trackingRange) {
-                    overrideDetection = false;
-                    canSeePlayer = false;
-                    OnPlayerLost();
-                } else {
-                    canSeePlayer = true; // Even if occluded
-                }
-            }
-        }
+        canSeePlayer = false;
+        OnPlayerLost();
     }
 
 
     public int GetInsistence(Blackboard blackboard) => 100;
 
     public void Execute(Blackboard blackboard) {
+        /*
         blackboard.AddAction(() => {
             blackboard.SetValue(playerLastPositionKey, transform.position); // inherited field now used
         });
+        */
     }
 
-    private bool IsPlayerWithinRange(float range) {
-        if (!blackboard.TryGetValue(playerLastPositionKey, out Vector3 playerPos))
+    private bool IsPlayerWithinRange(float range, string debugLabel = null) {
+        if (!blackboard.TryGetValue(playerLastPositionKey, out Vector3 playerPos)) {
+            if (debugLabel != null)
+                Debug.LogWarning($"[BT:{debugLabel}] PlayerLastPosition missing!");
             return false;
+        }
 
-        return Vector3.Distance(transform.position, playerPos) <= range;
+        float actualDist = Vector3.Distance(transform.position, playerPos);
+
+        if (debugLabel != null)
+            Debug.Log($"[BT:{debugLabel}] Distance to player: {actualDist:F2} vs. needed {range:F2}");
+
+        return actualDist <= range;
     }
+
 
     public void ResetTree() => tree?.Reset();
 

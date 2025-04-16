@@ -51,20 +51,6 @@ public class ShockwaveEffect : MonoBehaviour {
 
 
     #if UNITY_EDITOR
-    [ContextMenu("Set Line Shockwave Settings")]
-    private void SetLineShockwaveSettings() {
-        shockwaveSettings = new LineShockwaveSettings {
-            maxRadius = 10f,
-            duration = 1.5f,
-            strength = 0.8f,
-            thickness = 1.2f,
-            emissionColor = Color.blue,
-            particleScale = 1f,
-            target = transform.position + transform.forward * 5f,
-            width = 0.3f
-        };
-    }
-
     [ContextMenu("Set Radial Shockwave Settings")]
     private void SetRadialShockwaveSettings() {
         shockwaveSettings = new RadialShockwaveSettings {
@@ -72,10 +58,25 @@ public class ShockwaveEffect : MonoBehaviour {
             duration = 1f,
             strength = 1f,
             thickness = 0.75f,
-            emissionColor = Color.white,
+            emissionColorStart = Color.white,
+            emissionColorEnd = Color.yellow,
             particleScale = 1f
         };
     }
+
+    [ContextMenu("Set Line Shockwave Settings")]
+    private void SetLineShockwaveSettings() {
+        shockwaveSettings = new LineShockwaveSettings {
+            duration = 1.5f,
+            strength = 0.8f,
+            emissionColorStart = Color.blue,
+            emissionColorEnd = Color.cyan,
+            particleScale = 1f,
+            target = transform.position + transform.forward * 5f,
+            width = 0.3f
+        };
+    }
+
     #endif
 
 
