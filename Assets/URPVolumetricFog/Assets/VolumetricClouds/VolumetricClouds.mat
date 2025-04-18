@@ -120,10 +120,10 @@ Material:
     - _BumpScale: 1
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
-    - _CloudNearPlane: 828.0463
+    - _CloudNearPlane: 540.64966
     - _Cull: 2
     - _Cutoff: 0.5
-    - _DensityMultiplier: 0.32000002
+    - _DensityMultiplier: 0.11328801
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
@@ -159,7 +159,7 @@ Material:
     - _QueueOffset: 0
     - _ReceiveShadows: 1
     - _Seed: 0
-    - _ShapeFactor: 0.9
+    - _ShapeFactor: 0.824
     - _ShapeScale: 5
     - _SmallWindSpeed: 0.25
     - _Smoothness: 0.5
@@ -173,7 +173,7 @@ Material:
     - _SunSize: 0.04
     - _SunSizeConvergence: 5
     - _Surface: 0
-    - _VerticalErosionWindDisplacement: -0.6488176
+    - _VerticalErosionWindDisplacement: -0.95765877
     - _VerticalShapeNoiseOffset: 0
     - _VerticalShapeWindDisplacement: 0
     - _WorkflowMode: 1
@@ -188,7 +188,7 @@ Material:
     - _SkyTint: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _WindDirection: {r: -1, g: -0, b: 0, a: 0}
-    - _WindVector: {r: -259.5273, g: 0, b: 0, a: 0}
+    - _WindVector: {r: -383.0643, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
 --- !u!114 &4204168956660823475
 MonoBehaviour:

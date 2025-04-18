@@ -76,3 +76,14 @@ Assets/Scenes/InitialScene/LightingData.asset
 
 # Ignore ALL .blend1 files, but NOT .blend files
 *.blend1
+
+# Ignore baked lighting data
+[Ll]ightmap*
+[Ll]ightingData.asset
+[Ll]ightingData.asset.meta
+Assets/**/Lightmap*
+Assets/**/LightingData.asset
+Assets/**/LightingData.asset.meta
+Assets/**/LightSettings.lighting
+Assets/**/LightSettings.lighting.meta
+
