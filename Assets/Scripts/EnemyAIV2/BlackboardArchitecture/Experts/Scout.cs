@@ -32,8 +32,8 @@ public class Scout : EnemyVision, IExpert {
         base.Start();
 
         agent = GetComponent<NavMeshAgent>();
-        agent.angularSpeed = turningSpeed;
         agent.updateRotation = true;
+        agent.angularSpeed = turningSpeed;
 
         ServiceLocator.For(this).Get<BlackboardController>().RegisterExpert(this);
 

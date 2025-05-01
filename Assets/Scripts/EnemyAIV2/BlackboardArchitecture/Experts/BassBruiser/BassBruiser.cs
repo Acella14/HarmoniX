@@ -48,7 +48,7 @@ public class BassBruiser : EnemyVision, IExpert {
         Sequence jumpBranch = new Sequence("JumpAttack");
         jumpBranch.AddChild(new Leaf("IsTracking", new Condition(() => overrideDetection)));
         jumpBranch.AddChild(new Leaf("TooFarToChase", new Condition(() => !IsPlayerWithinRange(GetChaseRange() - 2f))));
-        jumpBranch.AddChild(new Leaf("JumpToPlayer", new JumpAndSlamStrategy(this, animator, blackboard, jumpArcCurve, 3.0f, 5.0f, 0.95f)));
+        jumpBranch.AddChild(new Leaf("JumpToPlayer", new JumpAndSlamStrategy(this, animator, blackboard, jumpArcCurve, 3.0f, 5.0f, 0.99f)));
         rootSelector.AddChild(jumpBranch);
 
         

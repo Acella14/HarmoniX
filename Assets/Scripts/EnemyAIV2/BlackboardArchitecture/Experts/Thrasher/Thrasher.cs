@@ -5,7 +5,8 @@ using UnityEngine.AI;
 using BlackboardSystem;
 using UnityServiceLocator;
 
-public class Thrasher : EnemyVision, IExpert {
+public class Thrasher : EnemyVision, IExpert, IShockwaveLaunchable {
+    [SerializeField] private LayerMask groundMask;
     private BehaviourTree tree;
     private UnityEngine.AI.NavMeshAgent agent;
     private Animator animator;
@@ -102,5 +103,47 @@ public class Thrasher : EnemyVision, IExpert {
     }
 
     public void ResetTree() => tree?.Reset();
+
+    public void LaunchFromShockwave(Vector3 origin, float force, float radius, int damage) 
+    {
+        // e.g. disable NavMeshAgent, add an upward arc, then restore.
+        StartCoroutine(DoEnemyLaunch(origin, force, radius, damage));
+    }
+
+    private IEnumerator DoEnemyLaunch(Vector3 origin, float force, float radius, int damage)
+    {
+        agent.enabled = false;
+
+        // store initial position so we don't drift horizontally
+        Vector3 startPos = transform.position;
+
+        // Unity's Physics.gravity.y is negative, so total airtime = 2 * v0 / |g|
+        float gravityY = -30f;
+        float flightTime = 2f * force / -gravityY;
+        float elapsed = 0f;
+
+        while (elapsed < flightTime)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Min(elapsed, flightTime);
+
+            // ballistic formula: y = v0*t + 0.5*g*t^2
+            float height = force * t + 0.5f * gravityY * t * t;
+
+            transform.position = startPos + Vector3.up * height;
+
+            yield return null;
+        }
+
+        // Ensure we end exactly at ground level
+        // you can raycast if your ground is uneven, or just use startPos.y
+        transform.position = startPos;
+
+        // slam back down — re-enable NavMeshAgent now that we’re “grounded”
+        agent.enabled = true;
+        agent.Warp(transform.position);
+    }
+
+
 }
 

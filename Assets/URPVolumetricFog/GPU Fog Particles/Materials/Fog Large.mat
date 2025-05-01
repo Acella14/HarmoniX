@@ -132,12 +132,12 @@ Material:
     - _ZWrite: 0
     - __dirty: 0
     m_Colors:
-    - _Albedo: {r: 1.4980391, g: 0.3764705, b: 1.0157429, a: 0.5176471}
+    - _Albedo: {r: 1.4980391, g: 0.41907448, b: 0.3764705, a: 0.44705883}
     - _CameraFadeParams: {r: 1, g: 1, b: 0, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _SimpleNoiseAnimation: {r: -0.1, g: 0.05, b: 0, a: 0}
-    - _SimplexNoiseAnimation: {r: 0, g: 0, b: 0.01, a: 0}
+    - _SimpleNoiseAnimation: {r: 0.2, g: 0, b: 0.1, a: 0}
+    - _SimplexNoiseAnimation: {r: 0, g: 0, b: 0, a: 0}
     - _SoftParticleFadeParams: {r: 0, g: 1, b: 0, a: 0}
-    - _VoronoiNoiseAnimation: {r: 0, g: 0, b: 0, a: 0}
+    - _VoronoiNoiseAnimation: {r: 0.24, g: 0.3, b: 0.3, a: 0}
   m_BuildTextureStacks: []

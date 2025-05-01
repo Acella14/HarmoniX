@@ -32,11 +32,16 @@ public static class default_Models {
         [Header("Jumping")]
         public int MaxAirJumps = 0;
         public float FallingSmoothing;
+        [Range(0f, 100f)] public float JumpMovementInfluence = 1f;
+        [Range(0f, 5f)] public float JumpTiltIntensity = 1f;
+        [Range(0f, 10f)] public float JumpMomentumDecayRate = 3f;
+
 
         [Header("Speed Effectors")]
         public float SpeedEffector = 1;
         public float CrouchSpeedEffector;
         public float FallingSpeedEffector;
+        [Range(1f, 5f)] public float GravityFallMultiplier = 2.5f;
 
     }
 

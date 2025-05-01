@@ -18,18 +18,28 @@ public class ShockwaveEffect : MonoBehaviour {
     public float radius = 5f;
     public float force = 10f;
     public int damage = 20;
-    public LayerMask playerMask;
+    public LayerMask launchableMask;
     public Vector3 explosionOffset = Vector3.zero;
 
     [Header("Audio")]
     public AudioClip shockwaveSFX;
 
 
-    public void LaunchNearbyPlayers() {
-        Collider[] hitPlayers = Physics.OverlapSphere(transform.position, radius, playerMask);
-        foreach (var hit in hitPlayers) {
-            if (hit.TryGetComponent<IShockwaveLaunchable>(out var launchable)) {
-                launchable.LaunchFromShockwave(transform.position, force, radius, damage);
+    public void LaunchNearby() {
+        var hits = Physics.OverlapSphere(transform.position, radius, launchableMask);
+
+        foreach (var col in hits) {
+            // filter out yourself
+            if (col.gameObject == this.gameObject)  
+                continue;
+
+            if (col.TryGetComponent<IShockwaveLaunchable>(out var launchable)) {
+                launchable.LaunchFromShockwave(
+                    transform.position,
+                    force,
+                    radius,
+                    damage
+                );
             }
         }
     }

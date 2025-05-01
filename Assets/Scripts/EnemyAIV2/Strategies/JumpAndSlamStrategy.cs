@@ -81,6 +81,7 @@ public class JumpAndSlamStrategy : IStrategy {
                     bruiser.audioSource.PlayOneShot(bruiser.jumpLaunchClip, 0.3f);
                 }
             }
+            agent.enabled = false;
             return Node.Status.Running;
         }
 
@@ -115,12 +116,12 @@ public class JumpAndSlamStrategy : IStrategy {
         slamTriggered = true;
         animator.SetTrigger("Slam");
 
-        // Warp position just in case (teleports NavMeshAgent to sync)
+        agent.enabled = true;
         agent.Warp(enemyTransform.position);
 
         // PHYSICS: Launch player if in range BEFORE visual effect
         if (shockwave != null) {
-            shockwave.LaunchNearbyPlayers();
+            shockwave.LaunchNearby();
             shockwave.TriggerShockwave(enemyTransform.position, shockwave.shockwaveSettings);
         }
 

@@ -11,7 +11,9 @@ public class CustomCharacterController : MonoBehaviour, IExpert, IShockwaveLaunc
 {
     #region - Variable Declarations -
     private CharacterController characterController;
-    private DefaultInput defaultInput;
+    private PlayerInputHandler inputHandler;
+    private ViewController viewController;
+    private MovementController movementController;
 
     [HideInInspector]
     public Vector2 input_Movement;
@@ -42,10 +44,14 @@ public class CustomCharacterController : MonoBehaviour, IExpert, IShockwaveLaunc
     public float jumpHeight = 1f;
     public AudioClip jumpSFX;
 
-    private Vector3 velocity;
-    private bool isGrounded;
-    private bool wasGrounded;
-    private int airJumpsRemaining;
+    [Header("Footsteps")]
+    public AudioClip[] footstepClips;
+    public float walkFootstepInterval = 0.5f;    // seconds between steps at your ‘normal’ speed
+    public float runFootstepInterval  = 0.35f;   // seconds between steps at your top speed
+    public float minStepPitch = 0.9f;
+    public float maxStepPitch = 1.1f;
+
+    private float footstepTimer = 0f;
 
     [Header("Stance")]
     public PlayerStance playerStance;
@@ -64,9 +70,6 @@ public class CustomCharacterController : MonoBehaviour, IExpert, IShockwaveLaunc
     [HideInInspector]
     public bool isSprinting;
 
-    private Vector3 newMovementSpeed;
-    private Vector3 newMovementSpeedVelocity;
-
     [Header("Weapon")]
     public CustomWeaponController currentWeaponR;
     public CustomWeaponController currentWeaponL;
@@ -81,24 +84,27 @@ public class CustomCharacterController : MonoBehaviour, IExpert, IShockwaveLaunc
     public float slideCameraTilt = 10f;
     public float slideFOVAdjustAmount = 5f;
     public AudioClip slideSFX;
+    private bool wasCrouchFromSlide;
+
+    [Header("Wall-Jump Settings")]
+    [Tooltip("How strongly you shoot away from the wall when you jump.")]
+    public float wallJumpAwayForce = 8f;
+    [Tooltip("How much vertical lift you get when you jump off a wall.")]
+    public float wallJumpUpForce   = 6f;
+    public float wallRunCameraTilt = 15f;
+    private float wallRunCameraTiltOffset;
+
 
     [Header("Ground Pound (& shockwave)")]
     public ShockwaveEffect shockwaveEffect;
-    public ShockwaveSettings groundPoundShockwaveSettings;
     public float groundPoundForce = 30f;
     public float groundPoundCooldown = 1f;
     private bool isGroundPounding = false;
 
 
-    private float slideTimer;
-    private bool isSliding;
-    private float lastSlideTime;
-    private Vector3 slideDirection;
     private Vector3 lastMovementDirection;
     private float defaultCameraFOV;
     private float currentCameraFOVVelocity;
-    private float cameraTilt;
-    private float cameraTiltVelocity;
     private Camera mainCamera;
     private float slideCameraTiltOffset;
     private float slideCameraFOVOffset;
@@ -117,27 +123,48 @@ public class CustomCharacterController : MonoBehaviour, IExpert, IShockwaveLaunc
 
     private void Awake()
     {
-        Cursor.lockState = CursorLockMode.Locked;
-
-        defaultInput = new DefaultInput();
-
-        defaultInput.Character.Movement.performed += e => input_Movement = e.ReadValue<Vector2>();
-        defaultInput.Character.View.performed += e => input_View = e.ReadValue<Vector2>();
-        defaultInput.Character.Jump.performed += e => Jump();
-        defaultInput.Character.Crouch.performed += e => Crouch();
-        defaultInput.Character.Sprint.performed += e => ToggleSprint();
-        defaultInput.Character.SprintReleased.performed += e => StopSprint();
-        defaultInput.Character.Slide.performed += e => Slide();
-        defaultInput.Character.GroundPound.performed += e => TryGroundPound();
-
-        defaultInput.Enable();
-
         newCameraRotation = cameraHolder.localRotation.eulerAngles;
         newCharacterRotation = transform.localRotation.eulerAngles;
-
         characterController = GetComponent<CharacterController>();
-
         cameraHeight = cameraHolder.localPosition.y;
+
+        Cursor.lockState = CursorLockMode.Locked;
+
+        inputHandler = GetComponent<PlayerInputHandler>();
+        if (inputHandler != null)
+        {
+            inputHandler.OnMove += val => input_Movement = val;
+            inputHandler.OnView += val => input_View = val;
+            inputHandler.OnJump += Jump;
+            inputHandler.OnCrouch += Crouch;
+            inputHandler.OnSprint += ToggleSprint;
+            inputHandler.OnSprintRelease += StopSprint;
+            inputHandler.OnSlide += Slide;
+            inputHandler.OnGroundPound += TryGroundPound;
+        }
+
+        viewController = new ViewController(
+            transform,
+            cameraHolder,
+            playerSettings,
+            viewClampYMin,
+            viewClampYMax,
+            slideCameraFOVSmoothing
+        );
+
+        movementController = new MovementController(
+            characterController,
+            transform,
+            playerSettings,
+            groundCheck,
+            groundMask,
+            groundDistance,
+            slideDuration,
+            slideDecelerationCurve,
+            slideSpeed,
+            gravity
+        );
+
 
         if (currentWeaponR)
         {
@@ -192,166 +219,98 @@ public class CustomCharacterController : MonoBehaviour, IExpert, IShockwaveLaunc
 
     private void Update()
     {
-        if (input_Movement.magnitude > 0.1f)
+        movementController.UpdateMovement(input_Movement, playerStance, isSprinting, Time.deltaTime);
+
+        bool grounded = movementController.IsGrounded;
+        bool movingInput = input_Movement.sqrMagnitude > 0.01f;
+        if (grounded && movingInput)
         {
-            lastMovementDirection = new Vector3(input_Movement.x, 0, input_Movement.y).normalized;
-            lastMovementDirection = transform.TransformDirection(lastMovementDirection);
+            float speed = new Vector3(characterController.velocity.x, 0, characterController.velocity.z).magnitude;
+
+            float t = Mathf.InverseLerp(
+                playerSettings.WalkingForwardSpeed,
+                playerSettings.RunningForwardSpeed,
+                speed
+            );
+
+            float interval = Mathf.Lerp(walkFootstepInterval, runFootstepInterval, t);
+
+            footstepTimer += Time.deltaTime;
+            if (footstepTimer >= interval)
+            {
+                PlayFootstep();
+                footstepTimer = 0f;
+            }
+        }
+        else
+        {
+            footstepTimer = 0f;
         }
 
-        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
+        bool onGroundOrWall = movementController.IsGrounded || movementController.IsWallRunning;
 
-        if (isGrounded && !wasGrounded)
+        if (onGroundOrWall
+            && movementController.CurrentMode != MovementMode.Jumping)
         {
-            airJumpsRemaining = playerSettings.MaxAirJumps;
+            movementController.ResetAirJumps();
         }
 
-        CalculateView();
-        CalculateMovementAndGravity();
-        CalculateStance();
+        if (wasCrouchFromSlide &&
+            movementController.IsGrounded &&
+            playerStance == PlayerStance.Crouch &&
+            !movementController.IsSliding &&
+            !StanceCheck(playerStandStance.StanceCollider.height))
+        {
+            playerStance = PlayerStance.Stand;
+            wasCrouchFromSlide = false;
+        }
+
+        if (movementController.IsWallRunning)
+        {
+            float sideDot = Vector3.Dot(transform.right, movementController.WallNormal);
+            wallRunCameraTiltOffset = -Mathf.Sign(sideDot) * wallRunCameraTilt;
+        }
+        else
+        {
+            wallRunCameraTiltOffset = 0f;
+        }
+
+        float dynamicTilt = slideCameraTiltOffset + wallRunCameraTiltOffset;
+
+        viewController.UpdateView(input_View, movementController.IsSliding || movementController.IsWallRunning, dynamicTilt);
         UpdateCameraFOV();
+
+        CalculateStance();
+
         UpdateAnimatorState();
 
         if (blackboard != null)
         {
             blackboard.SetValue(playerLastPositionKey, transform.position);
 
-            // Raycast from player down to find ground
             Ray ray = new Ray(transform.position, Vector3.down);
-            if (Physics.Raycast(ray, out RaycastHit hit, 100f, groundMask)) {
-                blackboard.SetValue(playerGroundPointKey, hit.point);
-            } else {
-                blackboard.SetValue(playerGroundPointKey, transform.position);
-            }
-        }
-
-        wasGrounded = isGrounded;
-    }
-
-    #endregion
-
-    #region - View / Movement -
-
-    private void CalculateView()
-    {
-        // Character rotation (Yaw)
-        newCharacterRotation.y += playerSettings.ViewXSensitivity *
-            (playerSettings.ViewXInverted ? -input_View.x : input_View.x) * Time.deltaTime;
-        transform.localRotation = Quaternion.Euler(newCharacterRotation);
-
-        // Camera rotation (Pitch)
-        newCameraRotation.x += playerSettings.ViewYSensitivity *
-            (playerSettings.ViewYInverted ? input_View.y : -input_View.y) * Time.deltaTime;
-        newCameraRotation.x = Mathf.Clamp(newCameraRotation.x, viewClampYMin, viewClampYMax);
-
-        // Camera tilt during slide
-        float targetTilt = 0f;
-        if (isSliding)
-        {
-            targetTilt = slideCameraTiltOffset;
-        }
-
-        cameraTilt = Mathf.SmoothDamp(cameraTilt, targetTilt, ref cameraTiltVelocity, slideCameraFOVSmoothing);
-
-        cameraHolder.localRotation = Quaternion.Euler(newCameraRotation.x, 0f, cameraTilt);
-    }
-
-    private void CalculateMovementAndGravity()
-    {
-        if (input_Movement.y <= 0.2f)
-        {
-            isSprinting = false;
-        }
-
-        var verticalSpeed = playerSettings.WalkingForwardSpeed;
-        var horizontalSpeed = playerSettings.WalkingStrafeSpeed;
-
-        if (isSprinting)
-        {
-            verticalSpeed = playerSettings.RunningForwardSpeed;
-            horizontalSpeed = playerSettings.RunningStrafeSpeed;
-        }
-
-        if (!characterController.isGrounded)
-        {
-            playerSettings.SpeedEffector = playerSettings.FallingSpeedEffector;
-        }
-        else if (playerStance == PlayerStance.Crouch)
-        {
-            playerSettings.SpeedEffector = playerSettings.CrouchSpeedEffector;
-        }
-        else
-        {
-            playerSettings.SpeedEffector = 1;
-        }
-
-        verticalSpeed *= playerSettings.SpeedEffector;
-        horizontalSpeed *= playerSettings.SpeedEffector;
-
-        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
-
-        if (isGrounded && velocity.y < 0)
-        {
-            velocity.y = -1f;
-        }
-
-        velocity.y += gravity * Time.deltaTime;
-
-        Vector3 targetMovement;
-
-        if (isSliding || slideTimer > 0f)
-        {
-            if (isSliding)
+            if (Physics.Raycast(ray, out RaycastHit hit, 100f, groundMask))
             {
-                slideTimer += Time.deltaTime;
-
-                if (slideTimer >= slideDuration)
-                {
-                    slideTimer = slideDuration;
-                    EndSlide();
-                }
+                blackboard.SetValue(playerGroundPointKey, hit.point);
             }
             else
             {
-                slideTimer += Time.deltaTime;
-
-                if (slideTimer >= slideDuration)
-                {
-                    slideTimer = 0f;
-                }
+                blackboard.SetValue(playerGroundPointKey, transform.position);
             }
-
-            float slideProgress = slideTimer / slideDuration;
-            float speedMultiplier = slideDecelerationCurve.Evaluate(slideProgress);
-            targetMovement = slideDirection * slideSpeed * speedMultiplier;
         }
-        else
-        {
-            targetMovement = new Vector3(horizontalSpeed * input_Movement.x, 0, verticalSpeed * input_Movement.y);
-            targetMovement = transform.TransformDirection(targetMovement);
-        }
-
-        newMovementSpeed = Vector3.SmoothDamp(
-            newMovementSpeed,
-            targetMovement,
-            ref newMovementSpeedVelocity,
-            characterController.isGrounded ? playerSettings.MovementSmoothing : playerSettings.FallingSmoothing
-        );
-
-        Vector3 movement = newMovementSpeed;
-        movement.y = velocity.y;
-
-        // Move the character
-        characterController.Move(movement * Time.deltaTime);
-
-        weaponAnimationSpeed = characterController.velocity.magnitude / (playerSettings.WalkingForwardSpeed * playerSettings.SpeedEffector);
-        if (weaponAnimationSpeed > 1)
-        {
-            weaponAnimationSpeed = 1;
-        }
-
-        currentWeaponR?.SetWeaponAnimations();
-        currentWeaponL?.SetWeaponAnimations();
     }
+
+    private void PlayFootstep()
+    {
+        if (footstepClips == null || footstepClips.Length == 0) return;
+
+        // pick a random clip
+        var clip = footstepClips[ Random.Range(0, footstepClips.Length) ];
+        // randomize pitch in a small range
+        //audioSource.pitch = Random.Range(minStepPitch, maxStepPitch);
+        audioSource.PlayOneShot(clip, 1f);
+    }
+
 
     #endregion
 
@@ -360,7 +319,7 @@ public class CustomCharacterController : MonoBehaviour, IExpert, IShockwaveLaunc
 
     private void TryGroundPound()
     {
-        if (characterController.isGrounded || isGroundPounding) return;
+        if (movementController.IsGrounded || isGroundPounding) return;
 
         StartCoroutine(DoGroundPound());
     }
@@ -370,39 +329,30 @@ public class CustomCharacterController : MonoBehaviour, IExpert, IShockwaveLaunc
     {
         isGroundPounding = true;
 
-        // Optional: play animation or audio
-        // currentWeaponR?.weaponAnimator.SetTrigger("GroundPoundStart");
-        // SFXSource.PlayOneShot(groundPoundStartSFX);
+        movementController.SetVerticalVelocity(-Mathf.Abs(groundPoundForce));
 
-        // Force downward velocity — accelerates fall
-        velocity.y = -Mathf.Abs(groundPoundForce);
-
-        // Wait until we hit the ground
-        while (!characterController.isGrounded)
-        {
+        while (!movementController.IsGrounded)
             yield return null;
+
+        if (shockwaveEffect == null) {
+            Debug.LogError("[GP] no ShockwaveEffect assigned!");
+        } else if (shockwaveEffect.shockwaveSettings == null) {
+            Debug.LogError("[GP] shockwaveSettings on ShockwaveEffect is null!");
+        } else {
+            shockwaveEffect.LaunchNearby();
+
+            Vector3 center = transform.position;
+            RaycastHit hit;
+            Vector3 origin = transform.position + Vector3.up * 0.1f;
+            if (Physics.Raycast(origin, Vector3.down, out hit, groundDistance + 1f, groundMask))
+                center = hit.point;
+
+            shockwaveEffect.TriggerShockwave(center, shockwaveEffect.shockwaveSettings);
         }
 
-        // Trigger the shockwave effect on landing
-        if (shockwaveEffect != null && groundPoundShockwaveSettings != null)
-        {
-            shockwaveEffect.TriggerShockwave(transform.position, groundPoundShockwaveSettings);
-            shockwaveEffect.LaunchNearbyPlayers();
-        }
-
-        // Camera shake
-        StartCoroutine(ShakeCamera(0.6f, 1f, 2f));
-
-        // Optional: landing animation or SFX
-        // currentWeaponR?.weaponAnimator.SetTrigger("GroundPoundImpact");
-        // SFXSource.PlayOneShot(groundPoundLandSFX);
-
-        // Cooldown
         yield return new WaitForSeconds(groundPoundCooldown);
-
         isGroundPounding = false;
     }
-
 
 
     #endregion
@@ -412,34 +362,63 @@ public class CustomCharacterController : MonoBehaviour, IExpert, IShockwaveLaunc
 
     private void Jump()
     {
-        if (isGrounded)
+        if (movementController.IsWallRunning)
         {
-            if (playerStance == PlayerStance.Crouch)
-            {
-                if (StanceCheck(playerStandStance.StanceCollider.height)) return;
+            Vector3 away = movementController.WallNormal * wallJumpAwayForce;
+            Vector3 up   = Vector3.up               * wallJumpUpForce;
+            Vector3 jumpDir = (away + up).normalized;
 
-                playerStance = PlayerStance.Stand;
-                return;
+            movementController.ApplyJump(jumpHeight, jumpDir, 1f);
+
+            audioSource.PlayOneShot(jumpSFX, 0.2f);
+            currentWeaponR?.weaponAnimator.SetTrigger("Jump");
+            currentWeaponL?.weaponAnimator.SetTrigger("Jump");
+
+            movementController.StopWallRun();
+            return;
+        }
+
+        bool wasGrounded = movementController.IsGrounded;
+
+        Vector3 inputDir      = new Vector3(input_Movement.x, 0f, input_Movement.y).normalized;
+        Vector3 directionalDir = transform.TransformDirection(inputDir);
+        Vector3 jumpBoost      = wasGrounded
+                                ? directionalDir
+                                : Vector3.zero;
+
+        bool jumped = movementController.TryJump(
+            playerStance,
+            height => StanceCheck(height),
+            jumpHeight,
+            jumpBoost,
+            allowCrouchJump: true
+        );
+
+        if (!jumped && playerStance == PlayerStance.Crouch 
+            && !StanceCheck(playerStandStance.StanceCollider.height))
+        {
+            playerStance = PlayerStance.Stand;
+        }
+
+        if (jumped)
+        {
+            audioSource.PlayOneShot(jumpSFX, 0.2f);
+            currentWeaponR?.weaponAnimator.SetTrigger("Jump");
+            currentWeaponL?.weaponAnimator.SetTrigger("Jump");
+            if (movementController.IsSliding)
+            {
+                movementController.StopSlide();
             }
 
-            PerformJump();
-        }
-        else if (airJumpsRemaining > 0)
-        {
-            airJumpsRemaining--;
-            PerformJump();
+            if (wasGrounded)
+            {
+                float verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
+                float timeToApex       = verticalVelocity / -gravity;
+                viewController.AnimateJumpTilt(directionalDir, timeToApex);
+            }
         }
     }
 
-    private void PerformJump()
-    {
-        audioSource.PlayOneShot(jumpSFX, 0.2f);
-        velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-        currentWeaponR?.weaponAnimator.SetTrigger("Jump");
-        currentWeaponL?.weaponAnimator.SetTrigger("Jump");
-
-        if (isSliding) EndSlide();
-    }
 
 
     public void LaunchFromShockwave(Vector3 origin, float force, float radius, int damage)
@@ -452,18 +431,18 @@ public class CustomCharacterController : MonoBehaviour, IExpert, IShockwaveLaunc
 
         // Apply mostly vertical force
         float verticalForce = force;
-        velocity.y = verticalForce;
+        movementController.SetVerticalVelocity(verticalForce);
 
         // Apply a small horizontal push
         float horizontalScale = 0.1f; // Only 10% of force goes into horizontal
         Vector3 horizontalPush = new Vector3(direction.x, 0f, direction.z) * (force * horizontalScale);
-        velocity += horizontalPush;
+        movementController.AddVelocity(horizontalPush);
 
         health?.TakeDamage(damage);
     }
 
     public void ApplyKnockback(Vector3 force) {
-        velocity += force;
+        movementController.AddVelocity(force);
         
         StartCoroutine(ShakeCamera(0.3f, 0.5f, 1f));
         Debug.Log("Knockback applied to player: " + force);
@@ -539,6 +518,7 @@ public class CustomCharacterController : MonoBehaviour, IExpert, IShockwaveLaunc
         }
 
         playerStance = PlayerStance.Crouch;
+        wasCrouchFromSlide = false;
     }
 
     private bool StanceCheck(float stanceCheckHeight)
@@ -578,33 +558,29 @@ public class CustomCharacterController : MonoBehaviour, IExpert, IShockwaveLaunc
 
     private void UpdateAnimatorState()
     {
-        if (isGrounded)
+        if (movementController.CurrentMode == MovementMode.Grounded)
         {
-            if (!wasGrounded)
-            {
-                currentWeaponR?.weaponAnimator.SetTrigger("Land");
-                currentWeaponL?.weaponAnimator.SetTrigger("Land");
+            currentWeaponR?.weaponAnimator.SetTrigger("Land");
+            currentWeaponL?.weaponAnimator.SetTrigger("Land");
 
-                currentWeaponR?.weaponAnimator.ResetTrigger("FallingIdle");
-                currentWeaponL?.weaponAnimator.ResetTrigger("FallingIdle");
-            }
+            currentWeaponR?.weaponAnimator.ResetTrigger("FallingIdle");
+            currentWeaponL?.weaponAnimator.ResetTrigger("FallingIdle");
         }
-        else
+        else if (movementController.IsFalling)
         {
-            if (velocity.y < 0 && !(currentWeaponR?.weaponAnimator.GetCurrentAnimatorStateInfo(0).IsName("FallingIdle") ?? true))
+            var fallingStateActive = currentWeaponR?.weaponAnimator.GetCurrentAnimatorStateInfo(0).IsName("FallingIdle") ?? false;
+            if (!fallingStateActive)
             {
                 currentWeaponR?.weaponAnimator.SetTrigger("FallingIdle");
                 currentWeaponL?.weaponAnimator.SetTrigger("FallingIdle");
             }
         }
 
-        currentWeaponR?.weaponAnimator.SetBool("isGrounded", isGrounded);
-        currentWeaponL?.weaponAnimator.SetBool("isGrounded", isGrounded);
+        currentWeaponR?.weaponAnimator.SetBool("isGrounded", movementController.IsGrounded);
+        currentWeaponL?.weaponAnimator.SetBool("isGrounded", movementController.IsGrounded);
 
-        currentWeaponR?.weaponAnimator.SetFloat("verticalVelocity", velocity.y);
-        currentWeaponL?.weaponAnimator.SetFloat("verticalVelocity", velocity.y);
-
-        wasGrounded = isGrounded;
+        currentWeaponR?.weaponAnimator.SetFloat("verticalVelocity", movementController.Velocity.y);
+        currentWeaponL?.weaponAnimator.SetFloat("verticalVelocity", movementController.Velocity.y);
     }
 
     #endregion
@@ -613,57 +589,34 @@ public class CustomCharacterController : MonoBehaviour, IExpert, IShockwaveLaunc
 
     private void Slide()
     {
-        if (!isSliding && Time.time - lastSlideTime >= slideCooldown && input_Movement.magnitude > 0.1f)
+        if (movementController.CanSlide(Time.time, input_Movement, slideCooldown))
         {
             audioSource.pitch = 0.2f;
-
             audioSource.PlayOneShot(slideSFX, 0.1f);
+            audioSource.pitch = 1f;
 
-            audioSource.pitch = 1.0f;
+            wasCrouchFromSlide = true;
+            playerStance = PlayerStance.Crouch;
 
-            isSliding = true;
-            slideTimer = 0f;
-            lastSlideTime = Time.time;
+            Vector3 inputDirection = new Vector3(input_Movement.x, 0, input_Movement.y).normalized;
+            Vector3 worldDirection = transform.TransformDirection(inputDirection);
+            Vector3 direction = input_Movement.magnitude > 0.1f ? worldDirection : transform.forward;
 
-            if (playerStance != PlayerStance.Crouch)
-            {
-                playerStance = PlayerStance.Crouch;
-            }
+            movementController.StartSlide(direction, Time.time);
 
-            slideDirection = lastMovementDirection;
-            if (slideDirection.magnitude == 0f)
-            {
-                slideDirection = transform.forward;
-            }
+            float forwardAmount = Vector3.Dot(direction.normalized, transform.forward);
+            float rightAmount = Vector3.Dot(direction.normalized, transform.right);
 
-            slideCameraTiltOffset = 0f;
-            slideCameraFOVOffset = 0f;
+            slideCameraTiltOffset = (Mathf.Abs(rightAmount) > Mathf.Abs(forwardAmount)) 
+                ? (Random.value < 0.5f ? -1f : 1f) * slideCameraTilt 
+                : 0f;
 
-            float forwardAmount = Vector3.Dot(slideDirection.normalized, transform.forward);
-            float rightAmount = Vector3.Dot(slideDirection.normalized, transform.right);
-
-            if (Mathf.Abs(rightAmount) > Mathf.Abs(forwardAmount))
-            {
-                // Left/Right slide
-                slideCameraTiltOffset = (Random.value < 0.5f ? -1f : 1f) * slideCameraTilt;
-                slideCameraFOVOffset = 0f;
-            }
-            else
-            {
-                // Forward/Backward slide
-                slideCameraTiltOffset = 0f;
-
-                if (forwardAmount > 0)
-                {
-                    slideCameraFOVOffset = -slideFOVAdjustAmount;
-                }
-                else
-                {
-                    slideCameraFOVOffset = slideFOVAdjustAmount;
-                }
-            }
+            slideCameraFOVOffset = (Mathf.Abs(rightAmount) > Mathf.Abs(forwardAmount)) 
+                ? 0f 
+                : (forwardAmount > 0 ? -slideFOVAdjustAmount : slideFOVAdjustAmount);
         }
     }
+
 
 
     private void UpdateCameraFOV()
@@ -671,7 +624,7 @@ public class CustomCharacterController : MonoBehaviour, IExpert, IShockwaveLaunc
         if (mainCamera == null) return;
 
         float targetFOV = defaultCameraFOV;
-        if (isSliding)
+        if (movementController.IsSliding)
         {
             targetFOV += slideCameraFOVOffset;
         }
@@ -684,24 +637,13 @@ public class CustomCharacterController : MonoBehaviour, IExpert, IShockwaveLaunc
         );
     }
 
-    private void EndSlide()
-    {
-        isSliding = false;
-
-        if (!StanceCheck(playerStandStance.StanceCollider.height))
-        {
-            playerStance = PlayerStance.Stand;
-        }
-    }
-
-
     #endregion
 
     #region - Getters -
 
     public bool GetIsGrounded()
     {
-        return isGrounded;
+        return movementController.IsGrounded;
     }
 
     public AudioSource GetAudioSource()

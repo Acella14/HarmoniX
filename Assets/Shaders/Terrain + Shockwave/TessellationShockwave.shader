@@ -3,31 +3,47 @@ Shader "Custom/TessellationShockwave"
     Properties
     {
         _BaseColor("Base Color", Color) = (1,1,1,1)
-        _TriplanarScale("Triplanar Scale", Float) = 4.0
+        _TriplanarScale0("Triplanar Scale - Layer 0", Float) = 4.0
+        _TriplanarScale0Var("Triplanar Scale - Layer 0 Variant", Float) = 4.0
+        _TriplanarScale1("Triplanar Scale - Layer 1", Float) = 4.0
+        _TriplanarScale2("Triplanar Scale - Layer 2", Float) = 4.0
+        _HeightScale("Height Strength", Range(0,1)) = 0.1
         _TessellationEdgeLength("Edge Length", Range(5, 100)) = 50
         [Toggle] _DebugTessellation("Debug Tessellation", Float) = 0
         _TessellationFactor("Tessellation Factor", Range(1, 64)) = 4
         [Toggle] _UseUniformTess("Use Uniform Tessellation", Float) = 0
+        [NoScaleOffset]_NoiseTex("Noise Texture", 2D) = "white" {}
+        _NoiseScale("Noise Scale", Float) = 0.2
+        _NoiseProjectionCenter("Noise Projection Center", Vector) = (0, 0, 0, 0)
+        _NoiseProjectionSize("Noise Projection Size", Float) = 1000
+        _NoiseUVOffset("Noise UV Offset", Vector) = (0, 0, 0, 0)
+        _BlendAmount("Variant Blend Threshold", Range(0, 1)) = 0.5
 
         [NoScaleOffset]_Layer0_Base("Layer 0 Albedo", 2D) = "white" {}
         [NoScaleOffset]_Layer0_Normal("Layer 0 Normal", 2D) = "bump" {}
         [NoScaleOffset]_Layer0_Roughness("Layer 0 Roughness", 2D) = "white" {}
         [NoScaleOffset]_Layer0_AO("Layer 0 AO", 2D) = "white" {}
+        [NoScaleOffset]_Layer0_Height("Layer 0 Height", 2D) = "gray" {}
+
+        [NoScaleOffset]_Layer0_Base2("Layer 0 Variant Albedo", 2D) = "white" {}
+        [NoScaleOffset]_Layer0_Normal2("Layer 0 Variant Normal", 2D) = "bump" {}
+        [NoScaleOffset]_Layer0_Height2("Layer 0 Variant Height", 2D) = "gray" {}
+
+
 
         [NoScaleOffset]_Layer1_Base("Layer 1 Albedo", 2D) = "white" {}
         [NoScaleOffset]_Layer1_Normal("Layer 1 Normal", 2D) = "bump" {}
-        [NoScaleOffset]_Layer1_Roughness("Layer 1 Roughness", 2D) = "white" {}
-        [NoScaleOffset]_Layer1_AO("Layer 1 AO", 2D) = "white" {}
+
 
         [NoScaleOffset]_Layer2_Base("Layer 2 Albedo", 2D) = "white" {}
         [NoScaleOffset]_Layer2_Normal("Layer 2 Normal", 2D) = "bump" {}
-        [NoScaleOffset]_Layer2_Roughness("Layer 2 Roughness", 2D) = "white" {}
-        [NoScaleOffset]_Layer2_AO("Layer 2 AO", 2D) = "white" {}
 
-        [NoScaleOffset]_Layer3_Base("Layer 3 Albedo", 2D) = "white" {}
-        [NoScaleOffset]_Layer3_Normal("Layer 3 Normal", 2D) = "bump" {}
-        [NoScaleOffset]_Layer3_Roughness("Layer 3 Roughness", 2D) = "white" {}
-        [NoScaleOffset]_Layer3_AO("Layer 3 AO", 2D) = "white" {}
+        [NoScaleOffset]_RoadMask("Road Mask", 2D) = "black" {}
+        _RoadMaskScale("Road Mask Scale", Float) = 1.0
+
+        [NoScaleOffset]_Road_Albedo("Road Albedo", 2D) = "white" {}
+        [NoScaleOffset]_Road_Normal("Road Normal", 2D) = "bump" {}
+        [NoScaleOffset]_Road_Roughness("Road Roughness", 2D) = "white" {}
     }
 
     SubShader
@@ -67,27 +83,44 @@ Shader "Custom/TessellationShockwave"
             TEXTURE2D(_Layer0_Normal); SAMPLER(sampler_Layer0_Normal);
             TEXTURE2D(_Layer0_Roughness); SAMPLER(sampler_Layer0_Roughness);
             TEXTURE2D(_Layer0_AO); SAMPLER(sampler_Layer0_AO);
+            TEXTURE2D(_Layer0_Height); SAMPLER(sampler_Layer0_Height);
+
+            TEXTURE2D(_Layer0_Base2); SAMPLER(sampler_Layer0_Base2);
+            TEXTURE2D(_Layer0_Normal2); SAMPLER(sampler_Layer0_Normal2);
+            TEXTURE2D(_Layer0_Height2); SAMPLER(sampler_Layer0_Height2);
+
 
             TEXTURE2D(_Layer1_Base); SAMPLER(sampler_Layer1_Base);
             TEXTURE2D(_Layer1_Normal); SAMPLER(sampler_Layer1_Normal);
-            TEXTURE2D(_Layer1_Roughness); SAMPLER(sampler_Layer1_Roughness);
-            TEXTURE2D(_Layer1_AO); SAMPLER(sampler_Layer1_AO);
+
 
             TEXTURE2D(_Layer2_Base); SAMPLER(sampler_Layer2_Base);
             TEXTURE2D(_Layer2_Normal); SAMPLER(sampler_Layer2_Normal);
-            TEXTURE2D(_Layer2_Roughness); SAMPLER(sampler_Layer2_Roughness);
-            TEXTURE2D(_Layer2_AO); SAMPLER(sampler_Layer2_AO);
 
-            TEXTURE2D(_Layer3_Base); SAMPLER(sampler_Layer3_Base);
-            TEXTURE2D(_Layer3_Normal); SAMPLER(sampler_Layer3_Normal);
-            TEXTURE2D(_Layer3_Roughness); SAMPLER(sampler_Layer3_Roughness);
-            TEXTURE2D(_Layer3_AO); SAMPLER(sampler_Layer3_AO);
+            TEXTURE2D(_RoadMask); SAMPLER(sampler_RoadMask);
+            TEXTURE2D(_Road_Albedo); SAMPLER(sampler_Road_Albedo);
+            TEXTURE2D(_Road_Normal); SAMPLER(sampler_Road_Normal);
+            TEXTURE2D(_Road_Roughness); SAMPLER(sampler_Road_Roughness);
+
 
             float4 _BaseColor;
-            float _TriplanarScale;
+            float _TriplanarScale0;
+            float _TriplanarScale0Var;
+            float _TriplanarScale1;
+            float _TriplanarScale2;
+            float _HeightScale;
             float _TessellationEdgeLength;
             float _TessellationFactor;
             float _UseUniformTess;
+
+            float _NoiseScale;
+            float4 _NoiseProjectionCenter;
+            float _NoiseProjectionSize;
+            float _BlendAmount;
+            float4 _NoiseUVOffset;
+            TEXTURE2D(_NoiseTex); SAMPLER(sampler_NoiseTex);
+
+            float _RoadMaskScale;
 
             struct Attributes
             {
@@ -195,84 +228,87 @@ Shader "Custom/TessellationShockwave"
                 return o;
             }
 
+            
             float3 TriplanarSample(Texture2D tex, SamplerState smp, float3 worldPos, float3 normalVec, float scale)
             {
                 float3 blends = abs(normalVec);
                 blends = pow(blends, 2.0);
                 blends /= (blends.x + blends.y + blends.z + 1e-5);
 
-                float3 colorX = 0, colorY = 0, colorZ = 0;
-                float totalWeight = 0.0;
+                float invScale = 1.0 / scale;
+                float2 uvX = worldPos.yz * invScale;
+                float2 uvY = worldPos.xz * invScale;
+                float2 uvZ = worldPos.xy * invScale;
 
-                float scales[3];
-                scales[0] = scale * 0.5;
-                scales[1] = scale;
-                scales[2] = scale * 2.0;
+                float3 x = tex.Sample(smp, uvX);
+                float3 y = tex.Sample(smp, uvY);
+                float3 z = tex.Sample(smp, uvZ);
 
-                [unroll]
-                for (int i = 0; i < 3; i++)
-                {
-                    float s = scales[i];
-
-                    float2 uvXY = worldPos.xy * s;
-                    float2 uvYZ = worldPos.yz * s;
-                    float2 uvXZ = worldPos.xz * s;
-
-                    colorX += tex.Sample(smp, uvYZ); // X axis projection
-                    colorY += tex.Sample(smp, uvXZ); // Y axis projection
-                    colorZ += tex.Sample(smp, uvXY); // Z axis projection
-
-                    totalWeight += 1.0;
-                }
-
-                colorX /= totalWeight;
-                colorY /= totalWeight;
-                colorZ /= totalWeight;
-
-                return colorX * blends.x + colorY * blends.y + colorZ * blends.z;
+                return x * blends.x + y * blends.y + z * blends.z;
             }
-
 
 
             half4 MyFragmentProgram(Varyings input) : SV_Target
             {
                 InputData inputData = (InputData)0;
-                inputData.positionWS = input.worldPos;
-                inputData.normalWS = normalize(input.normalWS);
+                inputData.positionWS      = input.worldPos;
+                inputData.normalWS        = normalize(input.normalWS);
                 inputData.viewDirectionWS = normalize(input.viewDirWS);
-                inputData.shadowCoord = TransformWorldToShadowCoord(input.worldPos);
+                inputData.shadowCoord     = TransformWorldToShadowCoord(input.worldPos);
 
+                float3 worldPos   = input.worldPos;
+                float3 normalWS   = normalize(input.normalWS);
+                float  slope      = 1.0 - saturate(dot(normalWS, float3(0,1,0)));
+                float  blendVal   = slope * 2.0;
 
-                float3 worldPos = input.worldPos;
-                float3 normalWS = normalize(input.normalWS);
-                float scale = _TriplanarScale;
+                float2 halfSize = float2(_NoiseProjectionSize * 0.5, _NoiseProjectionSize * 0.5);
+                float2 localXZ = worldPos.xz - (_NoiseProjectionCenter.xz - halfSize);
+                float2 noiseUV = ((localXZ / _NoiseProjectionSize) * _NoiseScale) + _NoiseUVOffset.xy;
 
-                // Slope factor
-                float slope = 1.0 - saturate(dot(normalWS, float3(0, 1, 0)));
-                float blendVal = slope * 3.0;
+                float noise = SAMPLE_TEXTURE2D(_NoiseTex, sampler_NoiseTex, noiseUV).r;
+                float blendStart = _BlendAmount - 0.1;
+                float blendEnd   = _BlendAmount + 0.1;
+                float variantBlend = smoothstep(blendStart, blendEnd, noise);
 
-                // Sample each layer
-                float3 albedo0 = TriplanarSample(_Layer0_Base, sampler_Layer0_Base, worldPos, normalWS, scale);
-                float3 albedo1 = TriplanarSample(_Layer1_Base, sampler_Layer1_Base, worldPos, normalWS, scale);
-                float3 albedo2 = TriplanarSample(_Layer2_Base, sampler_Layer2_Base, worldPos, normalWS, scale);
-                float3 albedo3 = TriplanarSample(_Layer3_Base, sampler_Layer3_Base, worldPos, normalWS, scale);
+                float h0 = lerp(
+                    TriplanarSample(_Layer0_Height, sampler_Layer0_Height, worldPos, normalWS, _TriplanarScale0).r,
+                    TriplanarSample(_Layer0_Height2, sampler_Layer0_Height2, worldPos, normalWS, _TriplanarScale0Var).r,
+                    variantBlend);
 
-                float3 normal0 = UnpackNormal(float4(TriplanarSample(_Layer0_Normal, sampler_Layer0_Normal, worldPos, normalWS, scale), 1.0));
-                float3 normal1 = UnpackNormal(float4(TriplanarSample(_Layer1_Normal, sampler_Layer1_Normal, worldPos, normalWS, scale), 1.0));
-                float3 normal2 = UnpackNormal(float4(TriplanarSample(_Layer2_Normal, sampler_Layer2_Normal, worldPos, normalWS, scale), 1.0));
-                float3 normal3 = UnpackNormal(float4(TriplanarSample(_Layer3_Normal, sampler_Layer3_Normal, worldPos, normalWS, scale), 1.0));
+                float height;
+                float h1 = 0.5;
+                float h2 = 0.5;
 
-                float r0 = TriplanarSample(_Layer0_Roughness, sampler_Layer0_Roughness, worldPos, normalWS, scale).r;
-                float r1 = TriplanarSample(_Layer1_Roughness, sampler_Layer1_Roughness, worldPos, normalWS, scale).r;
-                float r2 = TriplanarSample(_Layer2_Roughness, sampler_Layer2_Roughness, worldPos, normalWS, scale).r;
-                float r3 = TriplanarSample(_Layer3_Roughness, sampler_Layer3_Roughness, worldPos, normalWS, scale).r;
+                if (blendVal < 1.0)
+                    height = lerp(h0, h1, blendVal);
+                else
+                    height = lerp(h1, h2, blendVal - 1.0);
 
-                float ao0 = TriplanarSample(_Layer0_AO, sampler_Layer0_AO, worldPos, normalWS, scale).r;
-                float ao1 = TriplanarSample(_Layer1_AO, sampler_Layer1_AO, worldPos, normalWS, scale).r;
-                float ao2 = TriplanarSample(_Layer2_AO, sampler_Layer2_AO, worldPos, normalWS, scale).r;
-                float ao3 = TriplanarSample(_Layer3_AO, sampler_Layer3_AO, worldPos, normalWS, scale).r;
+                float remappedHeight = (height - 0.5) * 2.0;
+                float3 parallaxPos = worldPos + inputData.viewDirectionWS * (remappedHeight * _HeightScale);
 
-                // Blend between layers based on slope
+                float3 albedo0 = lerp(
+                    TriplanarSample(_Layer0_Base, sampler_Layer0_Base, parallaxPos, normalWS, _TriplanarScale0),
+                    TriplanarSample(_Layer0_Base2, sampler_Layer0_Base2, parallaxPos, normalWS, _TriplanarScale0Var),
+                    variantBlend);
+                float3 albedo1 = TriplanarSample(_Layer1_Base, sampler_Layer1_Base, parallaxPos, normalWS, _TriplanarScale1);
+                float3 albedo2 = TriplanarSample(_Layer2_Base, sampler_Layer2_Base, parallaxPos, normalWS, _TriplanarScale2);
+
+                float3 normal0 = UnpackNormal(float4(lerp(
+                    TriplanarSample(_Layer0_Normal, sampler_Layer0_Normal, parallaxPos, normalWS, _TriplanarScale0),
+                    TriplanarSample(_Layer0_Normal2, sampler_Layer0_Normal2, parallaxPos, normalWS, _TriplanarScale0Var),
+                    variantBlend), 1.0));
+                float3 normal1 = UnpackNormal(float4(TriplanarSample(_Layer1_Normal, sampler_Layer1_Normal, parallaxPos, normalWS, _TriplanarScale1), 1.0));
+                float3 normal2 = UnpackNormal(float4(TriplanarSample(_Layer2_Normal, sampler_Layer2_Normal, parallaxPos, normalWS, _TriplanarScale2), 1.0));
+
+                float r0 = TriplanarSample(_Layer0_Roughness, sampler_Layer0_Roughness, parallaxPos, normalWS, _TriplanarScale0).r;
+                float r1 = 0.5;
+                float r2 = 0.5;
+
+                float ao0 = TriplanarSample(_Layer0_AO, sampler_Layer0_AO, parallaxPos, normalWS, _TriplanarScale0).r;
+                float ao1 = 1.0;
+                float ao2 = 1.0;
+
                 float3 albedo;
                 float3 normalTS;
                 float roughness;
@@ -281,52 +317,62 @@ Shader "Custom/TessellationShockwave"
                 if (blendVal < 1.0)
                 {
                     float t = blendVal;
-                    albedo = lerp(albedo0, albedo1, t);
-                    normalTS = normalize(lerp(normal0, normal1, t));
+                    albedo    = lerp(albedo0, albedo1, t);
+                    normalTS  = normalize(lerp(normal0, normal1, t));
                     roughness = lerp(r0, r1, t);
-                    ao = lerp(ao0, ao1, t);
-                }
-                else if (blendVal < 2.0)
-                {
-                    float t = blendVal - 1.0;
-                    albedo = lerp(albedo1, albedo2, t);
-                    normalTS = normalize(lerp(normal1, normal2, t));
-                    roughness = lerp(r1, r2, t);
-                    ao = lerp(ao1, ao2, t);
+                    ao        = lerp(ao0, ao1, t);
                 }
                 else
                 {
-                    float t = blendVal - 2.0;
-                    albedo = lerp(albedo2, albedo3, t);
-                    normalTS = normalize(lerp(normal2, normal3, t));
-                    roughness = lerp(r2, r3, t);
-                    ao = lerp(ao2, ao3, t);
+                    float t = blendVal - 1.0;
+                    albedo    = lerp(albedo1, albedo2, t);
+                    normalTS  = normalize(lerp(normal1, normal2, t));
+                    roughness = lerp(r1, r2, t);
+                    ao        = lerp(ao1, ao2, t);
                 }
 
+                // Road mask sampling
+                float2 roadUV = ((localXZ / _NoiseProjectionSize) * _RoadMaskScale);
+                roadUV.xy = 1.0 - roadUV.xy;
+
+                roadUV = saturate(roadUV);
+                float roadMask = SAMPLE_TEXTURE2D(_RoadMask, sampler_RoadMask, roadUV).r;
+                roadMask = smoothstep(0.3, 0.7, roadMask); // Optional smoothing
+
+                // Sample road textures
+                float3 roadAlbedo = TriplanarSample(_Road_Albedo, sampler_Road_Albedo, parallaxPos, normalWS, _TriplanarScale0);
+                float3 roadNormal = UnpackNormal(float4(TriplanarSample(_Road_Normal, sampler_Road_Normal, parallaxPos, normalWS, _TriplanarScale0), 1.0));
+                float roadRoughness = TriplanarSample(_Road_Roughness, sampler_Road_Roughness, parallaxPos, normalWS, _TriplanarScale0).r;
+
+                // Blend in road
+                albedo    = lerp(albedo, roadAlbedo, roadMask);
+                normalTS  = normalize(lerp(normalTS, roadNormal, roadMask));
+                roughness = lerp(roughness, roadRoughness, roadMask);
 
                 SurfaceData surfaceData;
-                surfaceData.albedo = albedo * _BaseColor.rgb;
-                surfaceData.metallic = 0.0;
-                surfaceData.specular = 0.0;
-                surfaceData.smoothness = 1.0 - roughness;
-                surfaceData.normalTS = normalTS;
-                surfaceData.emission = input.emission;
-                surfaceData.occlusion = ao;
-                surfaceData.alpha = 1.0;
-                surfaceData.clearCoatMask = 0;
+                surfaceData.albedo            = albedo * _BaseColor.rgb;
+                surfaceData.metallic          = 0.0;
+                surfaceData.specular          = 0.0;
+                surfaceData.smoothness        = 1.0 - roughness;
+                surfaceData.normalTS          = normalTS;
+                surfaceData.emission          = input.emission;
+                surfaceData.occlusion         = ao;
+                surfaceData.alpha             = 1.0;
+                surfaceData.clearCoatMask     = 0;
                 surfaceData.clearCoatSmoothness = 0;
 
                 half4 color = UniversalFragmentBlinnPhong(inputData, surfaceData);
-                float shadow = MainLightRealtimeShadow(inputData.shadowCoord);
-                color.rgb *= shadow;
+                color.rgb *= MainLightRealtimeShadow(inputData.shadowCoord);
 
                 #if defined(_DEBUG_TESSELLATION)
-                float edgeHighlight = Wireframe(input.baryCoords);
-                color.rgb = lerp(color.rgb, float3(1, 0, 0), saturate(edgeHighlight * 4.0));
+                    float edgeHighlight = Wireframe(input.baryCoords);
+                    color.rgb = lerp(color.rgb, float3(1,0,0), saturate(edgeHighlight * 4.0));
                 #endif
 
                 return color;
             }
+
+
 
             ENDHLSL
         }
