@@ -106,26 +106,28 @@ public class CrosshairManager : MonoBehaviour
 
     private void UpdateBeatTimes()
     {
-        if (RhythmManager.Instance != null)
-        {
-            beatTimes = RhythmManager.Instance.GetBeatTimes();
-            scheduledBeatIndices.Clear();
+        if (RhythmManager.Instance == null) return;
 
-            if (includeHalfBeats)
-            {
-                GenerateHalfBeatTimes();
-            }
+        var beats = RhythmManager.Instance.GetBeatTimes();
+        if (beats == null || beats.Count < 2)
+        {
+            Debug.LogWarning("Beat data not ready yet—will wait for OnSongChanged");
+            return;
         }
+        
+        beatTimes = beats;
+        scheduledBeatIndices.Clear();
+
+        if (includeHalfBeats)
+            GenerateHalfBeatTimes();
     }
 
     private void GenerateHalfBeatTimes()
     {
         halfBeatTimes = new List<float>();
-
         for (int i = 0; i < beatTimes.Count - 1; i++)
         {
-            float halfBeatTime = (beatTimes[i] + beatTimes[i + 1]) / 2f;
-            halfBeatTimes.Add(halfBeatTime);
+            halfBeatTimes.Add((beatTimes[i] + beatTimes[i + 1]) * 0.5f);
         }
     }
 

@@ -13,7 +13,14 @@ namespace BlackboardSystem
         readonly Arbiter arbiter = new Arbiter();
 
         void Awake() {
+            if (ServiceLocator.Global.TryGet<BlackboardController>(out var _)) {
+                Destroy(gameObject);
+                return;
+            }
+
             ServiceLocator.Global.Register(this);
+            DontDestroyOnLoad(gameObject);
+
             blackboardData.SetValuesOnBlackboard(blackboard);
             blackboard.Debug();
         }

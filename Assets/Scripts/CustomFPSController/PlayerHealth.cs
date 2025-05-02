@@ -8,6 +8,7 @@ public class PlayerHealth : MonoBehaviour
 
     public event Action<int, int> OnHealthChanged;
     public event Action OnDamaged;
+    public event Action OnDeath;
 
     private void Awake()
     {
@@ -22,8 +23,7 @@ public class PlayerHealth : MonoBehaviour
 
         if (currentHealth <= 0)
         {
-            Debug.Log("Player Died");
-            // Handle death logic here
+            OnDeath?.Invoke();
         }
     }
 }

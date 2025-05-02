@@ -118,12 +118,13 @@ public class ChasePlayerStrategy : IStrategy {
     }
 
     public Node.Status Process() {
+
         if (enemy is Scout scout) {
             scout.currentState = Scout.AIState.Chase;
         }
 
-        if (!vision.canSeePlayer && !vision.overrideDetection) {
-            Debug.Log($"<color=red>[CHASE FAILED]</color> Lost track of player.");
+        if (!vision.overrideDetection) {
+            Debug.LogError("[Chase] Failed: overrideDetection is FALSE");
             return Node.Status.Failure;
         }
 
@@ -156,7 +157,6 @@ public class ChasePlayerStrategy : IStrategy {
             agent.SetDestination(lastKnownPosition);
             //Debug.Log($"<color=yellow>[CHASING]</color> {enemy.name} moving to {lastKnownPosition}");
         }
-
 
         return Node.Status.Running;
     }

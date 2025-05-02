@@ -48,7 +48,11 @@ public class Scout : EnemyVision, IExpert {
 
         // 1. CHASE SEQUENCE (Highest Priority: If player is visible, chase)
         Sequence engageBranch = new Sequence("Engage");
-        engageBranch.AddChild(new Leaf("Check Visibility", new Condition(() => canSeePlayer))); 
+        engageBranch.AddChild(new Leaf("IsTracking", new Condition(() => {
+            Debug.Log($"[BT] IsTracking condition check: overrideDetection = {this.overrideDetection}");
+            return this.overrideDetection;
+        })));
+
         engageBranch.AddChild(new Leaf("Chase Player", new ChasePlayerStrategy(this, agent, GetChaseSpeed(), GetChaseRange(), blackboard)));
         mainSelector.AddChild(engageBranch);
 
@@ -73,9 +77,52 @@ public class Scout : EnemyVision, IExpert {
         tree.AddChild(mainSelector);
     }
 
+    protected override void DetectPlayer() {
+    if (overrideDetection) {
+        if (blackboard.TryGetValue(playerLastPositionKey, out Vector3 playerPos)) {
+            float dist = Vector3.Distance(transform.position, playerPos);
+            if (dist > trackingRange) {
+                overrideDetection = false;
+                canSeePlayer = false;
+                OnPlayerLost();
+            } else {
+                if (!canSeePlayer) {
+                    Debug.Log("[Scout] Gained tracking via override — resetting tree");
+                    tree.Reset();
+                }
+                canSeePlayer = true;
+            }
+        }
+        return;
+    }
+
+    Collider[] colliders = Physics.OverlapSphere(transform.position, detectionRadius, playerLayer);
+    foreach (Collider col in colliders) {
+        Vector3 directionToTarget = (col.transform.position - transform.position).normalized;
+        float distanceToTarget = Vector3.Distance(transform.position, col.transform.position);
+        float angle = Vector3.Angle(transform.forward, directionToTarget);
+
+        if (!overrideDetection && angle < fovAngle * 0.5f &&
+            !Physics.Raycast(transform.position, directionToTarget, distanceToTarget, obstacleLayer)) {
+
+            Debug.Log("[Scout] Direct line of sight detected — setting override & resetting tree");
+            canSeePlayer = true;
+            OnPlayerDetected(col.transform.position);
+            overrideDetection = true;
+            tree.Reset(); // 💥 Force reset here
+            return;
+        }
+    }
+
+    canSeePlayer = false;
+    OnPlayerLost();
+}
 
 
-    void Update() {
+
+    private void Update() {
+        Debug.Log($"[Scout.Update] overrideDetection={overrideDetection}");
+
         if (!lastCanSeePlayer && canSeePlayer) {
             tree.Reset();
         }
@@ -86,7 +133,17 @@ public class Scout : EnemyVision, IExpert {
         UpdateIndicatorColor();
     }
 
+    private void LateUpdate() {
+        if (overrideDetection && blackboard.TryGetValue(playerLastPositionKey, out Vector3 playerPos)) {
+            Vector3 toPlayer = playerPos - transform.position;
+            toPlayer.y = 0f;
 
+            if (toPlayer.sqrMagnitude > 0.01f) {
+                Quaternion targetRot = Quaternion.LookRotation(toPlayer);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.deltaTime * 5f);
+            }
+        }
+    }
 
     private void UpdateIndicatorColor() {
         if (indicatorRenderer == null) return;
@@ -122,10 +179,6 @@ public class Scout : EnemyVision, IExpert {
     }
 
     public void Execute(Blackboard blackboard) {
-        blackboard.AddAction(() => {
-            if (blackboard.TryGetValue(isSafeKey, out bool isSafe)) {
-                blackboard.SetValue(isSafeKey, !isSafe);
-            }
-        });
+        //
     }
 }

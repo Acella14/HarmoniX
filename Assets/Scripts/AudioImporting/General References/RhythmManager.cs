@@ -32,15 +32,12 @@ public class RhythmManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
+        if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
+            return;
         }
+        Instance = this;
     }
 
     private void OnEnable()
@@ -249,6 +246,12 @@ public class RhythmManager : MonoBehaviour
     {
         return beatMarkers;
     }
+
+    private void OnDestroy()
+    {
+        if (Instance == this) 
+            Instance = null;
+    }
 }
 
 public struct BeatRecord
@@ -261,4 +264,5 @@ public struct BeatRecord
         this.time = time;
         this.index = index;
     }
+
 }

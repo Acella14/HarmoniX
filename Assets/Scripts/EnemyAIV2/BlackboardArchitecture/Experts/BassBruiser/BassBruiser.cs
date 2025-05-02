@@ -155,11 +155,6 @@ public class BassBruiser : EnemyVision, IExpert {
     public int GetInsistence(Blackboard blackboard) => 100;
 
     public void Execute(Blackboard blackboard) {
-        /*
-        blackboard.AddAction(() => {
-            blackboard.SetValue(playerLastPositionKey, transform.position); // inherited field now used
-        });
-        */
     }
 
     private bool IsPlayerWithinRange(float range, string debugLabel = null) {

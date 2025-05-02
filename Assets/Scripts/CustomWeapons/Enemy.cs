@@ -24,12 +24,17 @@ public class Enemy : MonoBehaviour
 
     void Die()
     {
+        var gm = FindObjectOfType<GameManager>();
+        if (gm != null)
+        {
+            gm.OnEnemyKilled();
+        }
+
         Destroy(gameObject);
     }
 
     private void DisplayDamageNumber(float damageAmount)
     {
-        // Instantiate the damage number prefab at the enemy's head position
         GameObject damageNumberObject = Instantiate(damageNumberPrefab, headTransform.position, Quaternion.identity);
 
         DamageNumber damageNumber = damageNumberObject.GetComponent<DamageNumber>();

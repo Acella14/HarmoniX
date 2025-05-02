@@ -25,6 +25,9 @@ public class PostProcessingFeedback : MonoBehaviour
     private float originalVignetteIntensity;
     private float originalChromatic;
 
+    public float InitialVignetteIntensity  { get; private set; }
+    public float InitialChromaticIntensity { get; private set; }
+
     private void Start()
     {
         if (postProcessingVolume != null && postProcessingVolume.profile != null)
@@ -34,13 +37,14 @@ public class PostProcessingFeedback : MonoBehaviour
 
             if (vignette != null)
             {
-                originalVignetteColor = vignette.color.value;
                 originalVignetteIntensity = vignette.intensity.value;
+                InitialVignetteIntensity = originalVignetteIntensity;
             }
 
             if (chromatic != null)
             {
                 originalChromatic = chromatic.intensity.value;
+                InitialChromaticIntensity = originalChromatic;
             }
         }
     }
@@ -106,5 +110,13 @@ public class PostProcessingFeedback : MonoBehaviour
         {
             chromatic.intensity.value = originalChromatic;
         }
+    }
+
+    public void SetEffectIntensity(float vignetteIntensity, float chromaticIntensity)
+    {
+        if (vignette != null)
+            vignette.intensity.value = vignetteIntensity;
+        if (chromatic != null)
+            chromatic.intensity.value = chromaticIntensity;
     }
 }
