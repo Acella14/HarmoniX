@@ -1,3 +1,5 @@
+#if UNITY_EDITOR
+
 using UnityEditor;
 using UnityEngine;
 using System.Linq;
@@ -97,3 +99,5 @@ public class FolderReferenceChecker : EditorWindow
         EditorUtility.ClearProgressBar();
     }
 }
+
+#endif

@@ -639,7 +639,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1631185543}
         m_TargetAssemblyTypeName: CDAnimator, Assembly-CSharp
-        m_MethodName: FlipActiveCD
+        m_MethodName: QuitGame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

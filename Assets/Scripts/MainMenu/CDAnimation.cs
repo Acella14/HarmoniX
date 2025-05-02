@@ -374,4 +374,13 @@ public class CDAnimator : MonoBehaviour
         if (!fadeIn) canvasGroup.gameObject.SetActive(false);
     }
 
+    public void QuitGame()
+    {
+    #if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false; // Stop play mode in Editor
+    #else
+        Application.Quit(); // Quit the build
+    #endif
+    }
+
 }
